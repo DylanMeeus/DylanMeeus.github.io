@@ -2,21 +2,21 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Dylan Meeus</title>
-    <link>http://it-ca.net/dylan/blog/</link>
+    <link>dylanmeeus.github.io/</link>
     <description>Recent content on Dylan Meeus</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <lastBuildDate>Fri, 22 Mar 2019 23:33:01 +0100</lastBuildDate>
     
-	<atom:link href="http://it-ca.net/dylan/blog/index.xml" rel="self" type="application/rss+xml" />
+	<atom:link href="dylanmeeus.github.io/index.xml" rel="self" type="application/rss+xml" />
     
     
     <item>
       <title>Version 2.0 of my blog :)</title>
-      <link>http://it-ca.net/dylan/blog/posts/new-blog/</link>
+      <link>dylanmeeus.github.io/posts/new-blog/</link>
       <pubDate>Fri, 22 Mar 2019 23:33:01 +0100</pubDate>
       
-      <guid>http://it-ca.net/dylan/blog/posts/new-blog/</guid>
+      <guid>dylanmeeus.github.io/posts/new-blog/</guid>
       <description>The past After two years of not having written anything for my blog, I&amp;rsquo;ve decided it was time to start anew.
 My old blog was created using WordPress in mid-2011, it was the first blog that was hosted on a machine a friend and I rented rather than blogspot. Whilst the blog served it&amp;rsquo;s purpose and was home to 7 years of content-creation, I felt like it was time to change things up.</description>
     </item>
