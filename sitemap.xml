@@ -3,11 +3,6 @@
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   
   <url>
-    <loc>https://dylanmeeus.github.io/posts/java-to-go/</loc>
-    <lastmod>2019-03-23T03:36:20+01:00</lastmod>
-  </url>
-  
-  <url>
     <loc>https://dylanmeeus.github.io/posts/new-blog/</loc>
     <lastmod>2019-03-22T23:33:01+01:00</lastmod>
   </url>
@@ -19,13 +14,13 @@
   
   <url>
     <loc>https://dylanmeeus.github.io/</loc>
-    <lastmod>2019-03-23T03:36:20+01:00</lastmod>
+    <lastmod>2019-03-22T23:33:01+01:00</lastmod>
     <priority>0</priority>
   </url>
   
   <url>
     <loc>https://dylanmeeus.github.io/posts/</loc>
-    <lastmod>2019-03-23T03:36:20+01:00</lastmod>
+    <lastmod>2019-03-22T23:33:01+01:00</lastmod>
     <priority>0</priority>
   </url>
   
