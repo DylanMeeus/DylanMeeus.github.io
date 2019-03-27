@@ -6,10 +6,20 @@
     <description>Recent content on Dylan Meeus</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Fri, 22 Mar 2019 23:33:01 +0100</lastBuildDate>
+    <lastBuildDate>Wed, 27 Mar 2019 21:32:53 +0100</lastBuildDate>
     
 	<atom:link href="https://dylanmeeus.github.io/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>Psychology of Computer Programming</title>
+      <link>https://dylanmeeus.github.io/posts/psychology-computer-programming/</link>
+      <pubDate>Wed, 27 Mar 2019 21:32:53 +0100</pubDate>
+      
+      <guid>https://dylanmeeus.github.io/posts/psychology-computer-programming/</guid>
+      <description>Recent I have read The Psychology of Computer Programming, written by Gerald M. Weinberg. The book was originally published in 1971, though it got republished in 2011. (I read it on a kindle paperwhite and it looked great! So don&amp;rsquo;t worry about the age of the book in case you fear it won&amp;rsquo;t look good in e-book format).
+Even though the book was written in a time before the public internet, Java, Javascript, smartphones and many more things we take for granted today, a lot of the content still rings true today.</description>
+    </item>
     
     <item>
       <title>Version 2.0 of my blog :)</title>
