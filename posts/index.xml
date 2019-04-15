@@ -6,10 +6,21 @@
     <description>Recent content in Posts on Dylan Meeus</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Wed, 27 Mar 2019 21:32:53 +0100</lastBuildDate>
+    <lastBuildDate>Mon, 15 Apr 2019 22:15:11 +0200</lastBuildDate>
     
 	<atom:link href="https://dylanmeeus.github.io/posts/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>go set benchmark</title>
+      <link>https://dylanmeeus.github.io/posts/go-set-benchmark/</link>
+      <pubDate>Mon, 15 Apr 2019 22:15:11 +0200</pubDate>
+      
+      <guid>https://dylanmeeus.github.io/posts/go-set-benchmark/</guid>
+      <description>Go does not have a set datastructure. A common pattern is to mimick a set by using a map where the key is the &amp;ldquo;set entry&amp;rdquo; and the value does not matter.
+In a discussion on hackernews recently, we discussed two similar implementations for a set, namely:
+ map[type]bool map[type]struct{}  They are almost identical, and whilst I really like the first definition it was brought to my attention that the second might be favourable for performance reasons.</description>
+    </item>
     
     <item>
       <title>Psychology of Computer Programming</title>
