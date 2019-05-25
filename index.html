@@ -24,7 +24,7 @@
 <meta property="og:type" content="website" />
 <meta property="og:url" content="https://dylanmeeus.github.io/" />
 
-<meta property="og:updated_time" content="2019-04-15T22:15:11&#43;02:00"/>
+<meta property="og:updated_time" content="2019-05-25T21:29:58&#43;02:00"/>
 
 
     
@@ -122,6 +122,29 @@
   <div class="post-list">
     
     
+      
+        
+      
+      <div class="post-list__item">
+        <span class="item__title--big">
+          <a href="/posts/hasgo/" >Hasgo: how does it work?</a>
+        </span>
+        <span class="item__date">
+          May 25, 2019
+        </span>
+        <span >
+        
+        Hasgo is a code generator that can be used to generate functions that work on slices. We don&rsquo;t have generics in Go, which I think is a good thing, but we can generate code with go:generate to work on different types.
+Hasgo does just this, we write functions and then say for which types we want to generate these functions. For our Ints, the generation looks like this:
+//go:generate hasgo -T=int64 -S=Ints type Ints []int64 This let&rsquo;s the generator know that our slice is called Ints but that the underlying type is int64.
+        
+        </span>
+        
+          ... <a class="read-more-symbol" href="/posts/hasgo/">➦</a>
+        
+        </div>
+        
+     
       
         
       

@@ -6,10 +6,21 @@
     <description>Recent content in Posts on Dylan Meeus</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Mon, 15 Apr 2019 22:15:11 +0200</lastBuildDate>
+    <lastBuildDate>Sat, 25 May 2019 21:29:58 +0200</lastBuildDate>
     
 	<atom:link href="https://dylanmeeus.github.io/posts/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>Hasgo: how does it work?</title>
+      <link>https://dylanmeeus.github.io/posts/hasgo/</link>
+      <pubDate>Sat, 25 May 2019 21:29:58 +0200</pubDate>
+      
+      <guid>https://dylanmeeus.github.io/posts/hasgo/</guid>
+      <description>Hasgo is a code generator that can be used to generate functions that work on slices. We don&amp;rsquo;t have generics in Go, which I think is a good thing, but we can generate code with go:generate to work on different types.
+Hasgo does just this, we write functions and then say for which types we want to generate these functions. For our Ints, the generation looks like this:
+//go:generate hasgo -T=int64 -S=Ints type Ints []int64 This let&amp;rsquo;s the generator know that our slice is called Ints but that the underlying type is int64.</description>
+    </item>
     
     <item>
       <title>go set benchmark</title>

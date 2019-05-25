@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en-us">
+    
+    
+
+
+    <head>
+    <link href="https://gmpg.org/xfn/11" rel="profile">
+    <meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta http-equiv="Cache-Control" content="public" />
+<!-- Enable responsiveness on mobile devices -->
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+<meta name="generator" content="Hugo 0.55.6" />
+
+    
+    
+    
+
+<title>Hasgo: how does it work? • Dylan Meeus</title>
+
+
+<meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="Hasgo: how does it work?"/>
+<meta name="twitter:description" content="Hasgo is a code generator that can be used to generate functions that work on slices. We don&rsquo;t have generics in Go, which I think is a good thing, but we can generate code with go:generate to work on different types.
+Hasgo does just this, we write functions and then say for which types we want to generate these functions. For our Ints, the generation looks like this:
+//go:generate hasgo -T=int64 -S=Ints type Ints []int64 This let&rsquo;s the generator know that our slice is called Ints but that the underlying type is int64."/>
+
+<meta property="og:title" content="Hasgo: how does it work?" />
+<meta property="og:description" content="Hasgo is a code generator that can be used to generate functions that work on slices. We don&rsquo;t have generics in Go, which I think is a good thing, but we can generate code with go:generate to work on different types.
+Hasgo does just this, we write functions and then say for which types we want to generate these functions. For our Ints, the generation looks like this:
+//go:generate hasgo -T=int64 -S=Ints type Ints []int64 This let&rsquo;s the generator know that our slice is called Ints but that the underlying type is int64." />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://dylanmeeus.github.io/posts/hasgo/" />
+<meta property="article:published_time" content="2019-05-25T21:29:58&#43;02:00"/>
+<meta property="article:modified_time" content="2019-05-25T21:29:58&#43;02:00"/>
+
+
+    
+
+
+
+
+
+
+<link rel="stylesheet" href="/scss/hyde-hyde.6a83d62c39a364f036df4db1ecd564645635d6c7fc182425cb501218fec485f5.css" integrity="sha256-aoPWLDmjZPA2302x7NVkZFY11sf8GCQly1ASGP7EhfU=">
+
+
+<link rel="stylesheet" href="/scss/print.2744dcbf8a0b2e74f8a50e4b34e5f441be7cf93cc7de27029121c6a09f9e77bc.css" integrity="sha256-J0Tcv4oLLnT4pQ5LNOX0Qb58&#43;TzH3icCkSHGoJ&#43;ed7w=" media="print">
+
+
+
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+    <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
+    <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+    <!-- Icons -->
+    <link rel="apple-touch-icon-precomposed" sizes="144x144" href="/apple-touch-icon-144-precomposed.png">
+    <link rel="shortcut icon" href="/favicon.png">
+    
+</head>
+
+
+    <body class=" ">
+    
+<div class="sidebar">
+  <div class="container ">
+    <div class="sidebar-about">
+      <span class="site__title">
+        <a href="https://dylanmeeus.github.io">Dylan Meeus</a>
+      </span>
+      
+      
+        <div class="author-image">
+          <img src="https://www.gravatar.com/avatar/174fdce3b3920fc7b21aff714b0b664d?s=240&d=mp" class="img--circle img--headshot element--center" alt="gravatar">
+        </div>
+      
+      <p class="site__description">
+        
+      </p>
+    </div>
+    <div class="collapsible-menu">
+      <input type="checkbox" id="menuToggle">
+      <label for="menuToggle">Dylan Meeus</label>
+      <div class="menu-content">
+        <div>
+	<ul class="sidebar-nav">
+		 
+		
+		</li>
+	</ul>
+</div>
+
+        <section class="social">
+	
+	<a href="https://twitter.com/https://twitter.com/DylanMeeus" rel="me"><i class="fab fa-twitter fa-lg" aria-hidden="true"></i></a>
+	
+	
+	
+	<a href="https://github.com/https://github.com/DylanMeeus" rel="me"><i class="fab fa-github fa-lg" aria-hidden="true"></i></a>
+	
+	
+	
+	
+	
+	
+	
+	<a href="https://linkedin.com/in/https://www.linkedin.com/in/dylanmeeus" rel="me"><i class="fab fa-linkedin fa-lg" aria-hidden="true"></i></a>
+	
+	
+	
+	
+	
+	
+	
+	
+</section>
+
+      </div>
+    </div>
+    
+
+
+  </div>
+</div>
+
+        <div class="content container">
+            
+    
+<article>
+  <header>
+    <h1>Hasgo: how does it work?</h1>
+    
+    
+<div class="post__meta">
+    
+    
+      <i class="fas fa-calendar-alt"></i> May 25, 2019
+    
+    
+    
+    
+    
+    <br/>
+    <i class="fas fa-clock"></i> 4 min read
+</div>
+
+
+  </header>
+  
+  
+  <div class="post">
+    
+
+<p>Hasgo is a code generator that can be used to generate functions that work on slices.
+We don&rsquo;t have generics in Go, which I think is a good thing, but we can generate code with <code>go:generate</code> to work on different types.</p>
+
+<p>Hasgo does just this, we write functions and then say for which types we want to generate these functions.
+For our Ints, the generation looks like this:</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#75715e">//go:generate hasgo -T=int64 -S=Ints
+</span><span style="color:#75715e"></span><span style="color:#66d9ef">type</span> <span style="color:#a6e22e">Ints</span> []<span style="color:#66d9ef">int64</span></code></pre></div>
+<p>This let&rsquo;s the generator know that our slice is called <code>Ints</code> but that the underlying type is <code>int64</code>. We could also have done this for
+custom structs (and specify which package the generated code should belong to):</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#75715e">//go:generate hasgo -T=person -S=persons -P=person
+</span><span style="color:#75715e"></span><span style="color:#66d9ef">type</span> <span style="color:#a6e22e">persons</span> []<span style="color:#a6e22e">person</span>
+<span style="color:#66d9ef">type</span> <span style="color:#a6e22e">person</span> <span style="color:#66d9ef">struct</span> {
+    <span style="color:#a6e22e">firstname</span> <span style="color:#66d9ef">string</span>
+    <span style="color:#a6e22e">lastname</span>  <span style="color:#66d9ef">string</span>
+    <span style="color:#a6e22e">age</span>       <span style="color:#66d9ef">int</span>
+}</code></pre></div>
+<h2 id="how-does-it-work">How does it work?</h2>
+
+<p>Hasgo is actually a combination of two code generators. We write our functions in Go code, but these would get compiled and thus unusable.
+We need the source code of those Go files to be able to generate the functions for our types. A typical source code file would look like this:</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#f92672">package</span> <span style="color:#a6e22e">functions</span>
+<span style="color:#66d9ef">func</span> (<span style="color:#a6e22e">s</span> <span style="color:#a6e22e">SliceType</span>) <span style="color:#a6e22e">Length</span>() <span style="color:#66d9ef">int</span> {
+    <span style="color:#66d9ef">return</span> len(<span style="color:#a6e22e">s</span>)
+}</code></pre></div>
+<p>This we&rsquo;d want to turn into the following code:</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#66d9ef">func</span> (<span style="color:#a6e22e">s</span> <span style="color:#a6e22e">Ints</span>) <span style="color:#a6e22e">Length</span>() <span style="color:#66d9ef">int</span> {
+    <span style="color:#66d9ef">return</span> len(<span style="color:#a6e22e">s</span>)
+}
+
+<span style="color:#66d9ef">func</span> (<span style="color:#a6e22e">s</span> <span style="color:#a6e22e">persons</span>) <span style="color:#a6e22e">Length</span>() <span style="color:#66d9ef">int</span> {
+    <span style="color:#66d9ef">return</span> len(<span style="color:#a6e22e">s</span>)
+}</code></pre></div>
+<h3 id="a-generator-power-the-generator">A generator power the generator</h3>
+
+<p>Hasgo actually has a first generator that just reads all files in the <code>/functions</code> directory and turns them into a <code>map[string]string</code>.
+This is where most of the &lsquo;magic&rsquo; happens. This generator only needs to be run by people working on Hasgo and not by people using the library.</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#66d9ef">var</span> <span style="color:#a6e22e">packageTemplate</span> = <span style="color:#a6e22e">template</span>.<span style="color:#a6e22e">Must</span>(<span style="color:#a6e22e">template</span>.<span style="color:#a6e22e">New</span>(<span style="color:#e6db74">&#34;&#34;</span>).
+	<span style="color:#a6e22e">Parse</span>(<span style="color:#e6db74">&#34;// Code generated by go generate; DO NOT EDIT.\n&#34;</span> <span style="color:#f92672">+</span>
+		<span style="color:#e6db74">&#34;package main\n&#34;</span> <span style="color:#f92672">+</span>
+		<span style="color:#e6db74">&#34;\n&#34;</span> <span style="color:#f92672">+</span>
+		<span style="color:#e6db74">&#34;var hasgoTemplates = map[string]string{\n&#34;</span> <span style="color:#f92672">+</span>
+		<span style="color:#e6db74">&#34;{{ range $fn, $file := . }}&#34;</span> <span style="color:#f92672">+</span>
+		<span style="color:#e6db74">&#34;\t\&#34;{{ $fn }}\&#34;: `{{ $file }}`,\n&#34;</span> <span style="color:#f92672">+</span>
+		<span style="color:#e6db74">&#34;{{ end }}&#34;</span> <span style="color:#f92672">+</span>
+		<span style="color:#e6db74">&#34;}\n&#34;</span>))
+
+<span style="color:#66d9ef">var</span> <span style="color:#a6e22e">domainTemplate</span> = <span style="color:#a6e22e">template</span>.<span style="color:#a6e22e">Must</span>(<span style="color:#a6e22e">template</span>.<span style="color:#a6e22e">New</span>(<span style="color:#e6db74">&#34;&#34;</span>).
+	<span style="color:#a6e22e">Parse</span>(<span style="color:#e6db74">&#34;\n&#34;</span> <span style="color:#f92672">+</span>
+		<span style="color:#e6db74">&#34;const (\n ForNumbers = \&#34;ForNumbers\&#34;\nForStrings = \&#34;ForStrings\&#34;\n&#34;</span> <span style="color:#f92672">+</span>
+		<span style="color:#e6db74">&#34;ForStructs = \&#34;ForStructs\&#34;\n)\n&#34;</span> <span style="color:#f92672">+</span>
+		<span style="color:#e6db74">&#34;var funcDomains = map[string][]string{\n&#34;</span> <span style="color:#f92672">+</span>
+		<span style="color:#e6db74">&#34;{{ range $fn, $arr := . }}&#34;</span> <span style="color:#f92672">+</span>
+		<span style="color:#e6db74">&#34;\t\&#34;{{ $fn }}\&#34;: []string{ {{ range $index, $dom := $arr }}&#34;</span> <span style="color:#f92672">+</span>
+		<span style="color:#e6db74">&#34; {{if $index}} ,{{end}} {{$dom}} {{end}} },\n&#34;</span> <span style="color:#f92672">+</span>
+		<span style="color:#e6db74">&#34;{{ end }}&#34;</span> <span style="color:#f92672">+</span>
+<span style="color:#e6db74">&#34;}\n&#34;</span>))</code></pre></div>
+<p>This is not my favourite piece of code in Hasgo, it&rsquo;s somewhat of a necessary evil.
+There&rsquo;s a bit more to this code (albeit not much), which you can <a href="https://github.com/DylanMeeus/hasgo/blob/master/generator.go">view here</a>.</p>
+
+<p>this step results in a <code>template.go</code> file which gets compiled and is accessible for our main generator in <code>hasgo.go</code>.</p>
+
+<p>It looks somewhat like this:</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#66d9ef">var</span> <span style="color:#a6e22e">hasgoTemplates</span> = <span style="color:#66d9ef">map</span>[<span style="color:#66d9ef">string</span>]<span style="color:#66d9ef">string</span>{
+	<span style="color:#e6db74">&#34;Abs.go&#34;</span>: <span style="color:#e6db74">`
+</span><span style="color:#e6db74">import (
+</span><span style="color:#e6db74">	&#34;math&#34;
+</span><span style="color:#e6db74">)
+</span><span style="color:#e6db74">func (s SliceType) Abs() (out SliceType) {
+</span><span style="color:#e6db74">	for _, v := range s {
+</span><span style="color:#e6db74">		out = append(out, ElementType(math.Abs(float64(v))))
+</span><span style="color:#e6db74">	}
+</span><span style="color:#e6db74">	return
+</span><span style="color:#e6db74">}
+</span><span style="color:#e6db74">`</span>,
+	<span style="color:#e6db74">&#34;Filter.go&#34;</span>: <span style="color:#960050;background-color:#1e0010">`</span>
+<span style="color:#66d9ef">func</span> (<span style="color:#a6e22e">s</span> <span style="color:#a6e22e">SliceType</span>) <span style="color:#a6e22e">Filter</span>(<span style="color:#a6e22e">f</span> <span style="color:#66d9ef">func</span>(<span style="color:#a6e22e">ElementType</span>) <span style="color:#66d9ef">bool</span>) (<span style="color:#a6e22e">out</span> <span style="color:#a6e22e">SliceType</span>) {
+	<span style="color:#66d9ef">for</span> <span style="color:#a6e22e">_</span>, <span style="color:#a6e22e">v</span> <span style="color:#f92672">:=</span> <span style="color:#66d9ef">range</span> <span style="color:#a6e22e">s</span> {
+		<span style="color:#66d9ef">if</span> <span style="color:#a6e22e">f</span>(<span style="color:#a6e22e">v</span>) {
+			<span style="color:#a6e22e">out</span> = append(<span style="color:#a6e22e">out</span>, <span style="color:#a6e22e">v</span>)
+		}
+	}
+	<span style="color:#66d9ef">return</span>
+}
+<span style="color:#f92672">//</span> <span style="color:#a6e22e">much</span> <span style="color:#a6e22e">more</span> <span style="color:#a6e22e">code</span><span style="color:#f92672">...</span></code></pre></div>
+<h3 id="which-templates-to-generate">Which templates to generate?</h3>
+
+<p>Before our generator-generator knows what to generate, we need to register it in <code>functions/main.go</code>.
+This is surprisingly simple, and allows us to not only specify which functions to include, but it also
+allows us to say on which types of data our function can work.</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#a6e22e">templates</span> = <span style="color:#66d9ef">map</span>[<span style="color:#66d9ef">string</span>][]<span style="color:#66d9ef">string</span>{
+		<span style="color:#e6db74">&#34;Length.go&#34;</span>: []<span style="color:#66d9ef">string</span>{<span style="color:#a6e22e">ForNumbers</span>, <span style="color:#a6e22e">ForStrings</span>, <span style="color:#a6e22e">ForStructs</span>},
+		<span style="color:#75715e">// more functions for great glory
+</span><span style="color:#75715e"></span>}</code></pre></div>
+<h3 id="the-main-generator">The main generator</h3>
+
+<p>Once we have our <code>template.go</code> generated, we can run <code>hasgo</code> and actually generate our functions.
+It can be roughly summed up in these steps:</p>
+
+<ul>
+<li>Read function templates</li>
+<li>Figure out if function applies to our type (Number, String, Structs)</li>
+<li>Extract the imports from our template</li>
+<li>Replace the &lsquo;placeholders&rsquo; with the correct Type / SliceType</li>
+<li>Combine all imports into one import statement</li>
+<li>Combine text and print to file</li>
+</ul>
+
+<p>This is (luckily) pretty straightforward code, just take a look <a href="https://github.com/DylanMeeus/hasgo/blob/master/hasgo.go">at the source</a>. There&rsquo;s no magic going on (at the time of  writing this) and I&rsquo;d like to
+keep it magic-free. Less magic is better 😃</p>
+
+<p>By now you should have some idea of how the generated code comes to be, so if you read this far you should be able to conceptually
+understand what is going on under the hood. I might blog about the main generator, or some functions
+later on. :)</p>
+
+  </div>
+  
+
+<div class="navigation navigation-single">
+    
+    <a href="/posts/go-set-benchmark/" class="navigation-prev">
+      <i aria-hidden="true" class="fa fa-chevron-left"></i>
+      <span class="navigation-tittle">go set benchmark</span>
+    </a>
+    
+    
+</div>
+
+
+  
+
+  
+    
+
+
+</article>
+
+
+        </div>
+        
+    
+
+<script defer src="https://use.fontawesome.com/releases/v5.5.0/js/all.js" integrity="sha384-GqVMZRt5Gn7tB9D9q7ONtcp4gtHIUEW/yG7h98J7IpE3kpi+srfFyyB/04OV6pG0" crossorigin="anonymous"></script>
+
+
+    
+    
+    <script type="text/javascript">
+        
+        hljs.initHighlightingOnLoad();
+    </script>
+    
+
+
+
+
+    
+
+
+
+    </body>
+</html>
