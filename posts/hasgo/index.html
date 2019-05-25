@@ -181,6 +181,11 @@ can do, check it out on <a href="https://www.github.com/DylanMeeus/hasgo">github
 
 <h2 id="how-does-it-work">How does it work?</h2>
 
+<p>Before I start explaining this, let me start off by saying that this approach is not something I
+thought of on my own. <a href="https://www.github.com/elliotchance/pie">Pie</a> played a huge role in how I
+eventually designed Hasgo. There are similarities in how Hasgo and Pie work, although they are not
+identical.</p>
+
 <p>Hasgo is actually a combination of two code generators. We write our functions in Go code, but these would get compiled and thus unusable.
 We need the source code of those Go files to be able to generate the functions for our types. A typical source code file would look like this:</p>
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#f92672">package</span> <span style="color:#a6e22e">functions</span>
