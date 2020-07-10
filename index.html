@@ -8,7 +8,7 @@
 <meta http-equiv="Cache-Control" content="public" />
 <!-- Enable responsiveness on mobile devices -->
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
-<meta name="generator" content="Hugo 0.57.1" />
+<meta name="generator" content="Hugo 0.73.0" />
 
     
 
@@ -23,8 +23,7 @@
 <meta property="og:description" content="" />
 <meta property="og:type" content="website" />
 <meta property="og:url" content="https://dylanmeeus.github.io/" />
-
-<meta property="og:updated_time" content="2019-05-25T21:29:58+02:00" />
+<meta property="og:updated_time" content="2020-07-11T01:38:36+02:00" />
 
 
     
@@ -50,6 +49,8 @@
     <link rel="apple-touch-icon-precomposed" sizes="144x144" href="/apple-touch-icon-144-precomposed.png">
     <link rel="shortcut icon" href="/favicon.png">
     <link rel="alternate" type="application/rss+xml" href="https://dylanmeeus.github.io/index.xml" title="Dylan Meeus" />
+
+    
 
 </head>
 
@@ -80,7 +81,6 @@
 	<ul class="sidebar-nav">
 		 
 		
-		</li>
 	</ul>
 </div>
 
@@ -99,6 +99,7 @@
 	
 	
 	<a href="https://linkedin.com/in/dylanmeeus" rel="me"><i class="fab fa-linkedin fa-lg" aria-hidden="true"></i></a>
+	
 	
 	
 	
@@ -127,16 +128,86 @@
       
       <div class="post-list__item">
         <span class="item__title--big">
-          <a href="/posts/" >Posts</a>
+          <a href="/posts/hasgo/" >Hasgo: how does it work?</a>
         </span>
         <span class="item__date">
           May 25, 2019
         </span>
         <span >
         
-        
+        What is Hasgo? Hasgo is a code generator that can be used to generate functions that work on slices. We don&rsquo;t have generics in Go, which I think is a good thing, but we can generate code with go:generate to work on different types.
+Hasgo does just this, we write functions and then say for which types we want to generate these functions. For our Ints, the generation looks like this:
         
         </span>
+        
+          ... <a class="read-more-symbol" href="/posts/hasgo/">➦</a>
+        
+        </div>
+        
+     
+      
+        
+      
+      <div class="post-list__item">
+        <span class="item__title--big">
+          <a href="/posts/go-set-benchmark/" >go set benchmark</a>
+        </span>
+        <span class="item__date">
+          Apr 15, 2019
+        </span>
+        <span >
+        
+        Go does not have a set datastructure. A common pattern is to mimick a set by using a map where the key is the &ldquo;set entry&rdquo; and the value does not matter.
+In a discussion on hackernews recently, we discussed two similar implementations for a set, namely:
+ map[type]bool map[type]struct{}  They are almost identical, and whilst I really like the first definition it was brought to my attention that the second might be favourable for performance reasons.
+        
+        </span>
+        
+          ... <a class="read-more-symbol" href="/posts/go-set-benchmark/">➦</a>
+        
+        </div>
+        
+     
+      
+        
+      
+      <div class="post-list__item">
+        <span class="item__title--big">
+          <a href="/posts/psychology-computer-programming/" >Psychology of Computer Programming</a>
+        </span>
+        <span class="item__date">
+          Mar 27, 2019
+        </span>
+        <span >
+        
+        Recently I have read The Psychology of Computer Programming, written by Gerald M. Weinberg. The book was originally published in 1971, though it got republished in 2011. (I read it on a kindle paperwhite and it looked great! So don&rsquo;t worry about the age of the book in case you fear it won&rsquo;t look good in e-book format).
+Even though the book was written in a time before the public internet, Java, Javascript, smartphones and many more things we take for granted today, a lot of the content still rings true today.
+        
+        </span>
+        
+          ... <a class="read-more-symbol" href="/posts/psychology-computer-programming/">➦</a>
+        
+        </div>
+        
+     
+      
+        
+      
+      <div class="post-list__item">
+        <span class="item__title--big">
+          <a href="/posts/new-blog/" >Version 2.0 of my blog :)</a>
+        </span>
+        <span class="item__date">
+          Mar 22, 2019
+        </span>
+        <span >
+        
+        The past After two years of not having written anything for my blog, I&rsquo;ve decided it was time to start anew.
+My old blog was created using WordPress in mid-2011, it was the first blog that was hosted on a machine a friend and I rented rather than blogspot. Whilst the blog served it&rsquo;s purpose and was home to 7 years of content-creation, I felt like it was time to change things up.
+        
+        </span>
+        
+          ... <a class="read-more-symbol" href="/posts/new-blog/">➦</a>
         
         </div>
         
@@ -148,7 +219,7 @@
         </div>
         
   
-  <script defer src="https://use.fontawesome.com/releases/v5.5.0/js/all.js" integrity="sha384-GqVMZRt5Gn7tB9D9q7ONtcp4gtHIUEW/yG7h98J7IpE3kpi+srfFyyB/04OV6pG0" crossorigin="anonymous"></script>
+  <script defer src="https://use.fontawesome.com/releases/v5.11.2/js/all.js" integrity="sha384-b3ua1l97aVGAPEIe48b4TC60WUQbQaGi2jqAWM90y0OZXZeyaTCWtBTKtjW2GXG1" crossorigin="anonymous"></script>
 
 
     </body>

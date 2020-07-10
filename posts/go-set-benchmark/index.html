@@ -11,7 +11,7 @@
 <meta http-equiv="Cache-Control" content="public" />
 <!-- Enable responsiveness on mobile devices -->
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
-<meta name="generator" content="Hugo 0.57.1" />
+<meta name="generator" content="Hugo 0.73.0" />
 
     
     
@@ -59,6 +59,8 @@ In a discussion on hackernews recently, we discussed two similar implementations
     <link rel="apple-touch-icon-precomposed" sizes="144x144" href="/apple-touch-icon-144-precomposed.png">
     <link rel="shortcut icon" href="/favicon.png">
     
+    
+
 </head>
 
 
@@ -88,7 +90,6 @@ In a discussion on hackernews recently, we discussed two similar implementations
 	<ul class="sidebar-nav">
 		 
 		
-		</li>
 	</ul>
 </div>
 
@@ -107,6 +108,7 @@ In a discussion on hackernews recently, we discussed two similar implementations
 	
 	
 	<a href="https://linkedin.com/in/dylanmeeus" rel="me"><i class="fab fa-linkedin fa-lg" aria-hidden="true"></i></a>
+	
 	
 	
 	
@@ -153,22 +155,17 @@ In a discussion on hackernews recently, we discussed two similar implementations
   <div class="post">
     <p>Go does not have a <code>set</code> datastructure. A common pattern is to mimick a <code>set</code> by using a map where
 the key is the &ldquo;set entry&rdquo; and the value does not matter.</p>
-
 <p>In a discussion on hackernews recently, we discussed two similar implementations for a <code>set</code>,
 namely:</p>
-
 <ul>
 <li>map[type]bool</li>
 <li>map[type]struct{}</li>
 </ul>
-
 <p>They are almost identical, and whilst I really like the first definition it was brought to my
 attention that the second might be favourable for performance reasons. Whilst I do like the
 readability of using a <code>map[string]bool</code>, I do want to write code that is somewhat performant.
 Luckily for us, Go provides us with benchmarking tools which we can use to check this.</p>
-
 <p>I wrote two small functions to check the insertion performance of these.</p>
-
 <pre><code>
 func BenchmarkBoolSet(b *testing.B) {
     m := make(map[int]bool,0)
@@ -184,27 +181,19 @@ func BenchmarkStructSet(b *testing.B) {
     }
 }
 
-</code></pre>
-
-<p>We can easily run this benchmark:</p>
-
+</code></pre><p>We can easily run this benchmark:</p>
 <pre><code>$go test -bench=.
 goos: linux
 goarch: amd64
 pkg: github.com/DylanMeeus/GoPlay/benchmark
 BenchmarkBoolSet-4           5695645           234 ns/op          40 B/op          0 allocs/op
 BenchmarkStructSet-4         6222277           210 ns/op          34 B/op          0 allocs/op
-</code></pre>
-
-<p>From these results we can tell that the &ldquo;bool-set&rdquo; uses a bit more memory and takes a bit more time
+</code></pre><p>From these results we can tell that the &ldquo;bool-set&rdquo; uses a bit more memory and takes a bit more time
 compared to our &ldquo;struct-set&rdquo;.</p>
-
 <p>While looking at this code, something jumped out at me. Why should we keep creating a
 new empty struct if we can just re-use the same struct? We don&rsquo;t care about the <code>value</code> of our map, only
 about the content.</p>
-
 <p>So we could define our empty struct outside the loop, which results in the following code:</p>
-
 <pre><code>var (
     empty = struct{}{}
 )
@@ -215,17 +204,12 @@ func BenchmarkStructOutside(b *testing.B) {
         m[i] = empty 
     }
 }
-</code></pre>
-
-<p>When we add this, we get a slight performance inprovement over the previous one. Memory allocation
+</code></pre><p>When we add this, we get a slight performance inprovement over the previous one. Memory allocation
 stayed the same though.</p>
-
 <pre><code>BenchmarkBoolSet-4           5695645           234 ns/op          40 B/op          0 allocs/op
 BenchmarkStructSet-4         6222277           210 ns/op          34 B/op          0 allocs/op
 BenchmarkStructOutside-4     6246123           206 ns/op          34 B/op          0 allocs/op
-</code></pre>
-
-<p>Considering the small difference between these last two methods, I&rsquo;d say it&rsquo;s probably neglible.
+</code></pre><p>Considering the small difference between these last two methods, I&rsquo;d say it&rsquo;s probably neglible.
 The difference between the &ldquo;bool-set&rdquo; and &ldquo;struct-set&rdquo; is slightly larger, so that&rsquo;s something you
 might want to keep in mind if you&rsquo;re writing a set somewhere in the hot path of your code. :)</p>
 
@@ -261,16 +245,7 @@ might want to keep in mind if you&rsquo;re writing a set somewhere in the hot pa
         
     
 
-<script defer src="https://use.fontawesome.com/releases/v5.5.0/js/all.js" integrity="sha384-GqVMZRt5Gn7tB9D9q7ONtcp4gtHIUEW/yG7h98J7IpE3kpi+srfFyyB/04OV6pG0" crossorigin="anonymous"></script>
-
-
-    
-    
-    <script type="text/javascript">
-        
-        hljs.initHighlightingOnLoad();
-    </script>
-    
+<script defer src="https://use.fontawesome.com/releases/v5.11.2/js/all.js" integrity="sha384-b3ua1l97aVGAPEIe48b4TC60WUQbQaGi2jqAWM90y0OZXZeyaTCWtBTKtjW2GXG1" crossorigin="anonymous"></script>
 
 
 
