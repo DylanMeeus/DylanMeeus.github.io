@@ -6,9 +6,28 @@
     <description>Recent content in Tags on Dylan Meeus</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
+    <lastBuildDate>Sun, 12 Jul 2020 21:14:03 +0200</lastBuildDate>
     
 	<atom:link href="https://dylanmeeus.github.io/tags/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>aboutme</title>
+      <link>https://dylanmeeus.github.io/tags/aboutme/</link>
+      <pubDate>Sun, 12 Jul 2020 21:14:03 +0200</pubDate>
+      
+      <guid>https://dylanmeeus.github.io/tags/aboutme/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>español</title>
+      <link>https://dylanmeeus.github.io/tags/espa%C3%B1ol/</link>
+      <pubDate>Sun, 12 Jul 2020 21:14:03 +0200</pubDate>
+      
+      <guid>https://dylanmeeus.github.io/tags/espa%C3%B1ol/</guid>
+      <description></description>
+    </item>
     
   </channel>
 </rss>
