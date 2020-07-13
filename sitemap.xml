@@ -3,22 +3,47 @@
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   
   <url>
+    <loc>https://dylanmeeus.github.io/posts/audio-from-scratch-pt1/</loc>
+    <lastmod>2020-07-13T18:43:21+02:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://dylanmeeus.github.io/categories/</loc>
+    <lastmod>2020-07-13T18:43:21+02:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://dylanmeeus.github.io/</loc>
+    <lastmod>2020-07-13T18:43:21+02:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://dylanmeeus.github.io/posts/</loc>
+    <lastmod>2020-07-13T18:43:21+02:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://dylanmeeus.github.io/tags/posts/</loc>
+    <lastmod>2020-07-13T18:43:21+02:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://dylanmeeus.github.io/categories/posts/</loc>
+    <lastmod>2020-07-13T18:43:21+02:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://dylanmeeus.github.io/tags/</loc>
+    <lastmod>2020-07-13T18:43:21+02:00</lastmod>
+  </url>
+  
+  <url>
     <loc>https://dylanmeeus.github.io/tags/aboutme/</loc>
     <lastmod>2020-07-12T21:14:03+02:00</lastmod>
   </url>
   
   <url>
     <loc>https://dylanmeeus.github.io/spanish/bienvenido-blog/</loc>
-    <lastmod>2020-07-12T21:14:03+02:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://dylanmeeus.github.io/categories/</loc>
-    <lastmod>2020-07-12T21:14:03+02:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://dylanmeeus.github.io/</loc>
     <lastmod>2020-07-12T21:14:03+02:00</lastmod>
   </url>
   
@@ -38,17 +63,7 @@
   </url>
   
   <url>
-    <loc>https://dylanmeeus.github.io/tags/</loc>
-    <lastmod>2020-07-12T21:14:03+02:00</lastmod>
-  </url>
-  
-  <url>
     <loc>https://dylanmeeus.github.io/posts/hasgo/</loc>
-    <lastmod>2019-05-25T21:29:58+02:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://dylanmeeus.github.io/posts/</loc>
     <lastmod>2019-05-25T21:29:58+02:00</lastmod>
   </url>
   

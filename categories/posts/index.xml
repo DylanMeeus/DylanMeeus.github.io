@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>posts on Dylan Meeus</title>
+    <link>https://dylanmeeus.github.io/categories/posts/</link>
+    <description>Recent content in posts on Dylan Meeus</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <lastBuildDate>Mon, 13 Jul 2020 18:43:21 +0200</lastBuildDate>
+    
+	<atom:link href="https://dylanmeeus.github.io/categories/posts/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>Audio From Scratch: Part 1, generating sounds</title>
+      <link>https://dylanmeeus.github.io/posts/audio-from-scratch-pt1/</link>
+      <pubDate>Mon, 13 Jul 2020 18:43:21 +0200</pubDate>
+      
+      <guid>https://dylanmeeus.github.io/posts/audio-from-scratch-pt1/</guid>
+      <description>Audio from scratch: generating sound In my &amp;lsquo;audio from scratch&amp;rsquo; series we will take a look at various ways in which we can manipulate audio data with Go. We&amp;rsquo;ll look at the anatomy of a wave file, how to apply stereo panning, converting mono files to stereo, how to work with breakpoint files through linear interpolation, etc.
+But, in this post we’ll be using Go to create sound from scratch in binary format.</description>
+    </item>
+    
+  </channel>
+</rss>
