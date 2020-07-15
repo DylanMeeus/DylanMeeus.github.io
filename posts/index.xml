@@ -6,10 +6,20 @@
     <description>Recent content in Posts on Dylan Meeus</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Mon, 13 Jul 2020 18:43:21 +0200</lastBuildDate>
+    <lastBuildDate>Mon, 13 Jul 2020 19:15:32 +0200</lastBuildDate>
     
 	<atom:link href="https://dylanmeeus.github.io/posts/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>Audio From Scratch Part2: Anatomy of a wave (file)</title>
+      <link>https://dylanmeeus.github.io/posts/audio-from-scratch-pt2/</link>
+      <pubDate>Mon, 13 Jul 2020 19:15:32 +0200</pubDate>
+      
+      <guid>https://dylanmeeus.github.io/posts/audio-from-scratch-pt2/</guid>
+      <description>In our last post we have looked at how we can create a simple binary sound file. By creating a sine wave with exponential decay, we can get the effect of a single note playing.
+It&amp;rsquo;s good to know what these types of files look like. In the real world however you&amp;rsquo;ll usually encounter files that are a bit more complex. One of the common formats to find audio in is the WAVE file format, normally denoted with the extension .</description>
+    </item>
     
     <item>
       <title>Audio From Scratch: Part 1, generating sounds</title>
