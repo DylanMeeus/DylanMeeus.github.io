@@ -6,10 +6,22 @@
     <description>Recent content on Dylan Meeus</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Mon, 13 Jul 2020 19:15:32 +0200</lastBuildDate>
+    <lastBuildDate>Sat, 18 Jul 2020 19:15:32 +0200</lastBuildDate>
     
 	<atom:link href="https://dylanmeeus.github.io/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>Audio From Scratch: Part3, amplitude changes</title>
+      <link>https://dylanmeeus.github.io/posts/audio-from-scratch-pt3/</link>
+      <pubDate>Sat, 18 Jul 2020 19:15:32 +0200</pubDate>
+      
+      <guid>https://dylanmeeus.github.io/posts/audio-from-scratch-pt3/</guid>
+      <description>In the previous post we have written code to read and write WAVE files. So now it&amp;rsquo;s time to start using this functionality to actually manipulate some sound. The goal of this post is simple, we want to change the amplitude of a given .wave file.
+For this, I will import the library we wrote in Part 2.
+The code for this post is also on Github.
+Changing amplitudes The program to change the amplitude will require three inputs:</description>
+    </item>
     
     <item>
       <title>Audio From Scratch: Part2, Anatomy of a wave (file)</title>
