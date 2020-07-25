@@ -6,7 +6,7 @@
     <description>Recent content in Tags on Dylan Meeus</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Sat, 18 Jul 2020 19:15:32 +0200</lastBuildDate>
+    <lastBuildDate>Mon, 20 Jul 2020 19:15:32 +0200</lastBuildDate>
     
 	<atom:link href="https://dylanmeeus.github.io/tags/index.xml" rel="self" type="application/rss+xml" />
     
@@ -14,7 +14,7 @@
     <item>
       <title>audio</title>
       <link>https://dylanmeeus.github.io/tags/audio/</link>
-      <pubDate>Sat, 18 Jul 2020 19:15:32 +0200</pubDate>
+      <pubDate>Mon, 20 Jul 2020 19:15:32 +0200</pubDate>
       
       <guid>https://dylanmeeus.github.io/tags/audio/</guid>
       <description></description>
@@ -23,9 +23,18 @@
     <item>
       <title>go</title>
       <link>https://dylanmeeus.github.io/tags/go/</link>
-      <pubDate>Sat, 18 Jul 2020 19:15:32 +0200</pubDate>
+      <pubDate>Mon, 20 Jul 2020 19:15:32 +0200</pubDate>
       
       <guid>https://dylanmeeus.github.io/tags/go/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>GoAudio</title>
+      <link>https://dylanmeeus.github.io/tags/goaudio/</link>
+      <pubDate>Mon, 20 Jul 2020 19:15:32 +0200</pubDate>
+      
+      <guid>https://dylanmeeus.github.io/tags/goaudio/</guid>
       <description></description>
     </item>
     

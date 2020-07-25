@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="en-us">
+    
+    
+
+
+    <head>
+    <link href="https://gmpg.org/xfn/11" rel="profile">
+    <meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta http-equiv="Cache-Control" content="public" />
+<!-- Enable responsiveness on mobile devices -->
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+<meta name="generator" content="Hugo 0.73.0" />
+
+    
+    
+    
+
+<title>Audio From Scratch With Go: stereo panning • Dylan Meeus</title>
+
+
+<meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="Audio From Scratch With Go: stereo panning"/>
+<meta name="twitter:description" content="In the previous post we have written code to change the amplitude of wave files.
+Now we&rsquo;ll take a look at how we can turn a mono wave file into a stereo wave file with an optional panning, and explore how this is represented internally by the WAVE file format.
+Channels The raw audio data inside a WAVE file consists of multiple frames. For now, we have called them &lsquo;samples&rsquo; although that is strictly speaking not entirely correct."/>
+
+<meta property="og:title" content="Audio From Scratch With Go: stereo panning" />
+<meta property="og:description" content="In the previous post we have written code to change the amplitude of wave files.
+Now we&rsquo;ll take a look at how we can turn a mono wave file into a stereo wave file with an optional panning, and explore how this is represented internally by the WAVE file format.
+Channels The raw audio data inside a WAVE file consists of multiple frames. For now, we have called them &lsquo;samples&rsquo; although that is strictly speaking not entirely correct." />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://dylanmeeus.github.io/posts/audio-from-scratch-pt4/" />
+<meta property="article:published_time" content="2020-07-20T19:15:32+02:00" />
+<meta property="article:modified_time" content="2020-07-20T19:15:32+02:00" />
+
+
+    
+
+
+
+
+
+
+<link rel="stylesheet" href="/scss/hyde-hyde.6a83d62c39a364f036df4db1ecd564645635d6c7fc182425cb501218fec485f5.css" integrity="sha256-aoPWLDmjZPA2302x7NVkZFY11sf8GCQly1ASGP7EhfU=">
+
+
+<link rel="stylesheet" href="/scss/print.2744dcbf8a0b2e74f8a50e4b34e5f441be7cf93cc7de27029121c6a09f9e77bc.css" integrity="sha256-J0Tcv4oLLnT4pQ5LNOX0Qb58&#43;TzH3icCkSHGoJ&#43;ed7w=" media="print">
+
+
+
+
+    
+<script type="application/javascript">
+var doNotTrack = false;
+if (!doNotTrack) {
+	(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+	(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+	m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+	})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+	ga('create', 'UA-172416417-1', 'auto');
+	
+	ga('send', 'pageview');
+}
+</script>
+
+    
+<script type="application/javascript">
+var doNotTrack = false;
+if (!doNotTrack) {
+	window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+	ga('create', 'UA-172416417-1', 'auto');
+	
+	ga('send', 'pageview');
+}
+</script>
+<script async src='https://www.google-analytics.com/analytics.js'></script>
+
+
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+    <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
+    <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+    <!-- Icons -->
+    <link rel="apple-touch-icon-precomposed" sizes="144x144" href="/apple-touch-icon-144-precomposed.png">
+    <link rel="shortcut icon" href="/favicon.png">
+    
+    
+
+</head>
+
+
+    <body class=" ">
+    
+<div class="sidebar">
+  <div class="container ">
+    <div class="sidebar-about">
+      <span class="site__title">
+        <a href="https://dylanmeeus.github.io">Dylan Meeus</a>
+      </span>
+      
+      
+        <div class="author-image">
+          <img src="https://www.gravatar.com/avatar/174fdce3b3920fc7b21aff714b0b664d?s=240&d=mp" class="img--circle img--headshot element--center" alt="gravatar">
+        </div>
+      
+      <p class="site__description">
+        
+      </p>
+    </div>
+    <div class="collapsible-menu">
+      <input type="checkbox" id="menuToggle">
+      <label for="menuToggle">Dylan Meeus</label>
+      <div class="menu-content">
+        <div>
+	<ul class="sidebar-nav">
+		 
+		
+	</ul>
+</div>
+
+        <section class="social">
+	
+	<a href="https://twitter.com/DylanMeeus" rel="me"><i class="fab fa-twitter fa-lg" aria-hidden="true"></i></a>
+	
+	
+	
+	<a href="https://github.com/DylanMeeus" rel="me"><i class="fab fa-github fa-lg" aria-hidden="true"></i></a>
+	
+	
+	
+	
+	
+	
+	
+	<a href="https://linkedin.com/in/dylanmeeus" rel="me"><i class="fab fa-linkedin fa-lg" aria-hidden="true"></i></a>
+	
+	
+	
+	
+	
+	
+	
+	
+	
+</section>
+
+      </div>
+    </div>
+    
+
+
+  </div>
+</div>
+
+        <div class="content container">
+            
+    
+<article>
+  <header>
+    <h1>Audio From Scratch With Go: stereo panning</h1>
+    
+    
+<div class="post__meta">
+    
+    
+      <i class="fas fa-calendar-alt"></i> Jul 20, 2020
+    
+    
+    
+      
+      
+          in
+          
+          
+              <a class="badge badge-category" href="/categories/posts">POSTS</a>
+              
+          
+      
+    
+    
+    
+      
+      
+          <br/>
+           <i class="fas fa-tags"></i>
+          
+          <a class="badge badge-tag" href="/tags/audio">audio</a>
+           
+      
+          <a class="badge badge-tag" href="/tags/go">go</a>
+           
+      
+          <a class="badge badge-tag" href="/tags/goaudio">goaudio</a>
+          
+      
+    
+    
+    <br/>
+    <i class="fas fa-clock"></i> 5 min read
+</div>
+
+
+  </header>
+  
+  
+  <div class="post">
+    <p>In the <a href="https://dylanmeeus.github.io/posts/audio-from-scratch-pt3/">previous post</a> we have written code to change the amplitude of wave files.</p>
+<p>Now we&rsquo;ll take a look at how we can turn a mono wave file into a stereo wave file with an optional
+panning, and explore how this is represented internally by the WAVE file format.</p>
+<h1 id="channels">Channels</h1>
+<p>The raw audio data inside a WAVE file consists of multiple frames. For now, we have called them
+&lsquo;samples&rsquo; although that is strictly speaking not entirely correct. In fact, single float in the raw
+audio data only corresponds to a single sample when we assume a mono audio file.</p>
+<p>When you have multiple channels, a single &lsquo;sample&rsquo; can consist of multiple frames. As each channel
+needs to play a certain &lsquo;frame&rsquo; at any given point in time.</p>
+<p>In the WAVE file format, the channels are interleaved. For example, a stereo file would be
+laid out like this:</p>
+<p><img src="/audio/interleaving.png" alt=""></p>
+<p>Here, each sample consists of two frames. Such that frame 1 and 2 make up sample 1, frame 3 and 4
+make up sample 2, and so on..</p>
+<p>Programs know how to interpret the raw audio data because of the <code>fmt</code> chunk inside the audio file,
+which specifies the number of channels that are present in the raw audio data. The maximum number of
+channels in a wave file is actually as high as 65,536, which does not actually make sense for audio
+data.</p>
+<p>Some common ones would be:</p>
+<ul>
+<li>1-channel: mono</li>
+<li>2-channel: stereo</li>
+<li>3-channel: stereo + center channel</li>
+<li>4-channel: Quadrophonic</li>
+<li>5-channel: &ldquo;Surround sound&rdquo;</li>
+</ul>
+<p>For convenience though, we&rsquo;ll mostly work on mono and stereo files. Not only are they the most
+commonly used, this also allows us to test our code without needing a more expensive setup.</p>
+<h1 id="panning">Panning</h1>
+<p>So what is a pan? When you pan an audio signal, you essentially make an audio signal &lsquo;louder&rsquo; on
+either the left or the right side. Typically in a <a href="https://en.wikipedia.org/wiki/Digital_audio_workstation">DAW</a> this would be represented by an &lsquo;automation
+track&rsquo; between the value of -1 to 1.</p>
+<p>The program to apply a pan will take three parameters:</p>
+<ul>
+<li>input file</li>
+<li>output file</li>
+<li>pan (-1 to 1)</li>
+</ul>
+<p>For the input file we will restrict this to mono files, and for the output files we will always
+generate a stereo file. The pan variable should be between -1 (left) and 1 (right). Before we can
+start applying our pan, we need to read the raw audio data from an input wave file. Remember that to
+read the wave file we will use the <a href="https://github.com/DylanMeeus/GoAudio">GoAudio</a> library we made
+earlier:</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#f92672">import</span> (
+        <span style="color:#a6e22e">wav</span> <span style="color:#e6db74">&#34;github.com/DylanMeeus/GoAudio/wave&#34;</span>
+)
+</code></pre></div><p>The set up for this program is rather simple, we will use the build-in <code>flags</code> package to parse the
+input from the CLI.</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#66d9ef">var</span> (
+	<span style="color:#a6e22e">input</span>  = <span style="color:#a6e22e">flag</span>.<span style="color:#a6e22e">String</span>(<span style="color:#e6db74">&#34;i&#34;</span>, <span style="color:#e6db74">&#34;&#34;</span>, <span style="color:#e6db74">&#34;input file&#34;</span>)
+	<span style="color:#a6e22e">output</span> = <span style="color:#a6e22e">flag</span>.<span style="color:#a6e22e">String</span>(<span style="color:#e6db74">&#34;o&#34;</span>, <span style="color:#e6db74">&#34;&#34;</span>, <span style="color:#e6db74">&#34;output file&#34;</span>)
+	<span style="color:#a6e22e">pan</span>    = <span style="color:#a6e22e">flag</span>.<span style="color:#a6e22e">Float64</span>(<span style="color:#e6db74">&#34;p&#34;</span>, <span style="color:#ae81ff">0.0</span>, <span style="color:#e6db74">&#34;pan in range of -1 (left) to 1 (right)&#34;</span>)
+)
+</code></pre></div><p>Once we have our flags set up, we can parse them and read the input file.</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#66d9ef">func</span> <span style="color:#a6e22e">main</span>() {
+	<span style="color:#a6e22e">flag</span>.<span style="color:#a6e22e">Parse</span>()
+	<span style="color:#a6e22e">infile</span> <span style="color:#f92672">:=</span> <span style="color:#f92672">*</span><span style="color:#a6e22e">input</span>
+	<span style="color:#a6e22e">outfile</span> <span style="color:#f92672">:=</span> <span style="color:#f92672">*</span><span style="color:#a6e22e">output</span>
+	<span style="color:#a6e22e">panfac</span> <span style="color:#f92672">:=</span> <span style="color:#f92672">*</span><span style="color:#a6e22e">pan</span>
+	<span style="color:#a6e22e">wave</span>, <span style="color:#a6e22e">err</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">wav</span>.<span style="color:#a6e22e">ReadWaveFile</span>(<span style="color:#a6e22e">infile</span>)
+	<span style="color:#66d9ef">if</span> <span style="color:#a6e22e">err</span> <span style="color:#f92672">!=</span> <span style="color:#66d9ef">nil</span> {
+		panic(<span style="color:#e6db74">&#34;Could not parse wave file&#34;</span>)
+	}
+        <span style="color:#f92672">...</span>
+}
+</code></pre></div><p>So far so good. We have parsed the input so we know which value to use for our pan, and we have read
+the raw audio data as well. But how do we go from a value in the range of (-1) to (1) to an actual
+change in loudness on the left or right-side? We can imagine that a simple function would look like
+this:</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#66d9ef">type</span> <span style="color:#a6e22e">panposition</span> <span style="color:#66d9ef">struct</span> {
+	<span style="color:#a6e22e">left</span>, <span style="color:#a6e22e">right</span> <span style="color:#66d9ef">float64</span>
+}
+
+<span style="color:#66d9ef">func</span> <span style="color:#a6e22e">calculatePosition</span>(<span style="color:#a6e22e">position</span> <span style="color:#66d9ef">float64</span>) <span style="color:#a6e22e">panposition</span> {
+	<span style="color:#a6e22e">position</span> <span style="color:#f92672">*=</span> <span style="color:#ae81ff">0.5</span>
+	<span style="color:#66d9ef">return</span> <span style="color:#a6e22e">panposition</span>{
+		<span style="color:#a6e22e">left</span>:  <span style="color:#a6e22e">position</span> <span style="color:#f92672">-</span> <span style="color:#ae81ff">0.5</span>,
+		<span style="color:#a6e22e">right</span>: <span style="color:#a6e22e">position</span> <span style="color:#f92672">+</span> <span style="color:#ae81ff">0.5</span>,
+	}
+}
+</code></pre></div><p>Here we are using a struct that can represent the amplitude on a scale of 0 to 1 for both the left
+and right channel. Such that we observe the following values:</p>
+<table>
+<thead>
+<tr>
+<th>position</th>
+<th>left-channel</th>
+<th>right-channel</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>0</td>
+<td>0.5</td>
+<td>0.5</td>
+</tr>
+<tr>
+<td>1</td>
+<td>0</td>
+<td>1</td>
+</tr>
+<tr>
+<td>-1</td>
+<td>1</td>
+<td>0</td>
+</tr>
+</tbody>
+</table>
+<p>In other words, if the position is zero the sound is perfectly balanced between the left and
+right-side of your headphones. And in the extreme values, the sound is either only left-sided or
+right-sided.</p>
+<p>Just like in the previous post, we actually need to alter the frames based on the position data we
+found in the <code>calculatePosition</code> function. We can create a function that modifies the frames based
+on the <code>panposition</code> returned in the previous function.</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#66d9ef">func</span> <span style="color:#a6e22e">applyPan</span>(<span style="color:#a6e22e">frames</span> []<span style="color:#a6e22e">wav</span>.<span style="color:#a6e22e">Frame</span>, <span style="color:#a6e22e">p</span> <span style="color:#a6e22e">panposition</span>) []<span style="color:#a6e22e">wav</span>.<span style="color:#a6e22e">Frame</span> {
+	<span style="color:#a6e22e">out</span> <span style="color:#f92672">:=</span> []<span style="color:#a6e22e">wav</span>.<span style="color:#a6e22e">Frame</span>{}
+	<span style="color:#66d9ef">for</span> <span style="color:#a6e22e">_</span>, <span style="color:#a6e22e">s</span> <span style="color:#f92672">:=</span> <span style="color:#66d9ef">range</span> <span style="color:#a6e22e">frames</span> {
+		<span style="color:#a6e22e">out</span> = append(<span style="color:#a6e22e">out</span>, <span style="color:#a6e22e">wav</span>.<span style="color:#a6e22e">Frame</span>(float64(<span style="color:#a6e22e">s</span>)<span style="color:#f92672">*</span><span style="color:#a6e22e">p</span>.<span style="color:#a6e22e">left</span>))
+		<span style="color:#a6e22e">out</span> = append(<span style="color:#a6e22e">out</span>, <span style="color:#a6e22e">wav</span>.<span style="color:#a6e22e">Frame</span>(float64(<span style="color:#a6e22e">s</span>)<span style="color:#f92672">*</span><span style="color:#a6e22e">p</span>.<span style="color:#a6e22e">right</span>))
+	}
+	<span style="color:#66d9ef">return</span> <span style="color:#a6e22e">out</span>
+}
+</code></pre></div><p>Notice how for each <code>frame</code> we actually append two <code>frames</code> to the resulting slice! That is how we
+are interleaving the left and right audio channel.</p>
+<p>Now we can finish up the main method:</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go">        <span style="color:#f92672">...</span>
+	<span style="color:#a6e22e">pos</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">calculatePosition</span>(<span style="color:#a6e22e">panfac</span>)
+	<span style="color:#a6e22e">scaledFrames</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">applyPan</span>(<span style="color:#a6e22e">wave</span>.<span style="color:#a6e22e">Frames</span>, <span style="color:#a6e22e">calculatePosition</span>(<span style="color:#a6e22e">panfac</span>))
+	<span style="color:#a6e22e">wave</span>.<span style="color:#a6e22e">NumChannels</span> = <span style="color:#ae81ff">2</span> <span style="color:#75715e">// samples are now stereo, so we need dual channels
+</span><span style="color:#75715e"></span>	<span style="color:#66d9ef">if</span> <span style="color:#a6e22e">err</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">wav</span>.<span style="color:#a6e22e">WriteFrames</span>(<span style="color:#a6e22e">scaledFrames</span>, <span style="color:#a6e22e">wave</span>.<span style="color:#a6e22e">WaveFmt</span>, <span style="color:#a6e22e">outfile</span>); <span style="color:#a6e22e">err</span> <span style="color:#f92672">!=</span> <span style="color:#66d9ef">nil</span> {
+		panic(<span style="color:#a6e22e">err</span>)
+	}
+</code></pre></div><p>A crucial step here is that before writing the samples we have set ran <code>wave.NumChannels=2</code>. Without
+this, the wave file would be interpreted as a mono sound file and our panning effect would have been
+lost.</p>
+<h1 id="testing-the-code">Testing the code</h1>
+<p>To test this, I find it easy to use an input file without a lot of things going on. I&rsquo;m mainly using
+this simple <a href="/audio/part4/mono.wav">mono file</a>.</p>
+<p>If we run <code>go run main.go -i mono.wav -o left-side.wav -p -1</code> we get:</p>
+<p><a href="/audio/part4/left-side.wav">left-side.wav</a></p>
+<p>And when we  run <code>go run main.go -i mono.wav -o right-side.wav -p 1</code> we get:</p>
+<p><a href="/audio/part4/right-side.wav">right-side.wav</a></p>
+<h1 id="next-steps">Next steps?</h1>
+<p>There is actually a flaw with this panning function that we are using. However it is not apparent to
+us yet because we can only set a pan for an entire audio source. To see why this panning function is
+not perfect we need to first introduce breakpoints as a way to create automation tracks, so the focus for our next few posts will be
+breakpoints. :-)</p>
+<hr>
+<h1 id="resources">Resources</h1>
+<ul>
+<li><a href="https://github.com/DylanMeeus/GoAudio">GoAudio</a></li>
+<li><a href="https://github.com/DylanMeeus/GoAudio/blob/master/examples/stereopan/main.go">Panning code</a></li>
+</ul>
+<hr>
+<p>If you liked this and want to know when I write new posts, the best way to keep up to date is by <a href="https://twitter.com/DylanMeeus">following me on
+twitter</a>. ;-)</p>
+
+  </div>
+  
+
+<div class="navigation navigation-single">
+    
+    <a href="/posts/audio-from-scratch-pt3/" class="navigation-prev">
+      <i aria-hidden="true" class="fa fa-chevron-left"></i>
+      <span class="navigation-tittle">Audio From Scratch: Part3, changing the amplitude</span>
+    </a>
+    
+    
+</div>
+
+
+  
+
+  
+    
+
+
+</article>
+
+
+        </div>
+        
+    
+
+  
+  
+<script type="application/javascript">
+var doNotTrack = false;
+if (!doNotTrack) {
+	window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+	ga('create', 'UA-172416417-1', 'auto');
+	
+	ga('send', 'pageview');
+}
+</script>
+<script async src='https://www.google-analytics.com/analytics.js'></script>
+
+
+<script defer src="https://use.fontawesome.com/releases/v5.11.2/js/all.js" integrity="sha384-b3ua1l97aVGAPEIe48b4TC60WUQbQaGi2jqAWM90y0OZXZeyaTCWtBTKtjW2GXG1" crossorigin="anonymous"></script>
+
+
+
+
+    
+
+
+
+    </body>
+</html>

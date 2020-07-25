@@ -6,10 +6,21 @@
     <description>Recent content in audio on Dylan Meeus</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Sat, 18 Jul 2020 19:15:32 +0200</lastBuildDate>
+    <lastBuildDate>Mon, 20 Jul 2020 19:15:32 +0200</lastBuildDate>
     
 	<atom:link href="https://dylanmeeus.github.io/tags/audio/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>Audio From Scratch With Go: stereo panning</title>
+      <link>https://dylanmeeus.github.io/posts/audio-from-scratch-pt4/</link>
+      <pubDate>Mon, 20 Jul 2020 19:15:32 +0200</pubDate>
+      
+      <guid>https://dylanmeeus.github.io/posts/audio-from-scratch-pt4/</guid>
+      <description>In the previous post we have written code to change the amplitude of wave files.
+Now we&amp;rsquo;ll take a look at how we can turn a mono wave file into a stereo wave file with an optional panning, and explore how this is represented internally by the WAVE file format.
+Channels The raw audio data inside a WAVE file consists of multiple frames. For now, we have called them &amp;lsquo;samples&amp;rsquo; although that is strictly speaking not entirely correct.</description>
+    </item>
     
     <item>
       <title>Audio From Scratch: Part3, changing the amplitude</title>
