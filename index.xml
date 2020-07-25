@@ -12,7 +12,7 @@
     
     
     <item>
-      <title>Audio From Scratch With Go: stereo panning</title>
+      <title>Audio From Scratch With Go: Stereo panning</title>
       <link>https://dylanmeeus.github.io/posts/audio-from-scratch-pt4/</link>
       <pubDate>Mon, 20 Jul 2020 19:15:32 +0200</pubDate>
       
@@ -23,7 +23,7 @@ Channels The raw audio data inside a WAVE file consists of multiple frames. For 
     </item>
     
     <item>
-      <title>Audio From Scratch: Part3, changing the amplitude</title>
+      <title>Audio From Scratch With Go: Changing the amplitude</title>
       <link>https://dylanmeeus.github.io/posts/audio-from-scratch-pt3/</link>
       <pubDate>Sat, 18 Jul 2020 19:15:32 +0200</pubDate>
       
@@ -35,7 +35,7 @@ Changing amplitudes The program to change the amplitude will require three input
     </item>
     
     <item>
-      <title>Audio From Scratch: Part2, Anatomy of a wave (file)</title>
+      <title>Audio From Scratch With Go: Anatomy of a wave (file)</title>
       <link>https://dylanmeeus.github.io/posts/audio-from-scratch-pt2/</link>
       <pubDate>Mon, 13 Jul 2020 19:15:32 +0200</pubDate>
       
@@ -45,7 +45,7 @@ It&amp;rsquo;s good to know what these types of files look like. In the real wor
     </item>
     
     <item>
-      <title>Audio From Scratch: Part 1, generating sounds</title>
+      <title>Audio From Scratch With Go: Generating first sounds</title>
       <link>https://dylanmeeus.github.io/posts/audio-from-scratch-pt1/</link>
       <pubDate>Mon, 13 Jul 2020 18:43:21 +0200</pubDate>
       
