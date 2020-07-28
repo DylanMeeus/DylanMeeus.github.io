@@ -6,10 +6,20 @@
     <description>Recent content on Dylan Meeus</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Mon, 20 Jul 2020 19:15:32 +0200</lastBuildDate>
+    <lastBuildDate>Tue, 28 Jul 2020 20:31:44 +0200</lastBuildDate>
     
 	<atom:link href="https://dylanmeeus.github.io/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>Audio From Scratch With Go: Breakpoints</title>
+      <link>https://dylanmeeus.github.io/posts/audio-from-scratch-pt5/</link>
+      <pubDate>Tue, 28 Jul 2020 20:31:44 +0200</pubDate>
+      
+      <guid>https://dylanmeeus.github.io/posts/audio-from-scratch-pt5/</guid>
+      <description>Audio Breakpoints To clear up a potential mistake, this blogpost is about breakpoints for audio files, not the ones we use for debugging code ;-). A breakpoint file forms the basis for what is often called &amp;lsquo;envelopes&amp;rsquo; or &amp;lsquo;automation tracks&amp;rsquo; in DAWs.
+They are simple files that contain pairs of timestamp:value data. With this simple structure, they allow us to specify what certain properties of the sound file should look like at various points in time.</description>
+    </item>
     
     <item>
       <title>Audio From Scratch With Go: Stereo panning</title>
@@ -18,7 +28,7 @@
       
       <guid>https://dylanmeeus.github.io/posts/audio-from-scratch-pt4/</guid>
       <description>In the previous post we have written code to change the amplitude of wave files.
-Now we&amp;rsquo;ll take a look at how we can turn a mono wave file into a stereo wave file with an optional panning, and explore how this is represented internally by the WAVE file format.
+Now we&amp;rsquo;ll take a look at how we can turn a mono wave file into a stereo wave file with optional panning, and explore how this is represented internally by the WAVE file format.
 Channels The raw audio data inside a WAVE file consists of multiple frames. For now, we have called them &amp;lsquo;samples&amp;rsquo; although that is strictly speaking not entirely correct.</description>
     </item>
     
