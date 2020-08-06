@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="en-us">
+    
+    
+
+
+    <head>
+    <link href="https://gmpg.org/xfn/11" rel="profile">
+    <meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta http-equiv="Cache-Control" content="public" />
+<!-- Enable responsiveness on mobile devices -->
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+<meta name="generator" content="Hugo 0.73.0" />
+
+    
+    
+    
+
+<title>Audio From Scratch With Go: Automated Constant-Power Panning • Dylan Meeus</title>
+
+
+<meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="Audio From Scratch With Go: Automated Constant-Power Panning"/>
+<meta name="twitter:description" content="In a previous post we have looked at how we can turn a mono audio signal into a stereo signal with an applied pan. One drawback of this program was that it was not possible to change the pan throughout the track, meaning that once a pan had been selected it would be applied to the entire song.
+Now that we have implemented breakpoints, we can start looking at changing the pan (and other properties) throughout the duration of the track."/>
+
+<meta property="og:title" content="Audio From Scratch With Go: Automated Constant-Power Panning" />
+<meta property="og:description" content="In a previous post we have looked at how we can turn a mono audio signal into a stereo signal with an applied pan. One drawback of this program was that it was not possible to change the pan throughout the track, meaning that once a pan had been selected it would be applied to the entire song.
+Now that we have implemented breakpoints, we can start looking at changing the pan (and other properties) throughout the duration of the track." />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://dylanmeeus.github.io/posts/audio-from-scratch-pt6/" />
+<meta property="article:published_time" content="2020-08-06T20:05:53+02:00" />
+<meta property="article:modified_time" content="2020-08-06T20:05:53+02:00" />
+
+
+    
+
+
+
+
+
+
+<link rel="stylesheet" href="/scss/hyde-hyde.6a83d62c39a364f036df4db1ecd564645635d6c7fc182425cb501218fec485f5.css" integrity="sha256-aoPWLDmjZPA2302x7NVkZFY11sf8GCQly1ASGP7EhfU=">
+
+
+<link rel="stylesheet" href="/scss/print.2744dcbf8a0b2e74f8a50e4b34e5f441be7cf93cc7de27029121c6a09f9e77bc.css" integrity="sha256-J0Tcv4oLLnT4pQ5LNOX0Qb58&#43;TzH3icCkSHGoJ&#43;ed7w=" media="print">
+
+
+
+
+    
+<script type="application/javascript">
+var doNotTrack = false;
+if (!doNotTrack) {
+	(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+	(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+	m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+	})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+	ga('create', 'UA-172416417-1', 'auto');
+	
+	ga('send', 'pageview');
+}
+</script>
+
+    
+<script type="application/javascript">
+var doNotTrack = false;
+if (!doNotTrack) {
+	window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+	ga('create', 'UA-172416417-1', 'auto');
+	
+	ga('send', 'pageview');
+}
+</script>
+<script async src='https://www.google-analytics.com/analytics.js'></script>
+
+
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+    <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
+    <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+    <!-- Icons -->
+    <link rel="apple-touch-icon-precomposed" sizes="144x144" href="/apple-touch-icon-144-precomposed.png">
+    <link rel="shortcut icon" href="/favicon.png">
+    
+    
+
+</head>
+
+
+    <body class=" ">
+    
+<div class="sidebar">
+  <div class="container ">
+    <div class="sidebar-about">
+      <span class="site__title">
+        <a href="https://dylanmeeus.github.io">Dylan Meeus</a>
+      </span>
+      
+      
+        <div class="author-image">
+          <img src="https://www.gravatar.com/avatar/174fdce3b3920fc7b21aff714b0b664d?s=240&d=mp" class="img--circle img--headshot element--center" alt="gravatar">
+        </div>
+      
+      <p class="site__description">
+        
+      </p>
+    </div>
+    <div class="collapsible-menu">
+      <input type="checkbox" id="menuToggle">
+      <label for="menuToggle">Dylan Meeus</label>
+      <div class="menu-content">
+        <div>
+	<ul class="sidebar-nav">
+		 
+		
+	</ul>
+</div>
+
+        <section class="social">
+	
+	<a href="https://twitter.com/DylanMeeus" rel="me"><i class="fab fa-twitter fa-lg" aria-hidden="true"></i></a>
+	
+	
+	
+	<a href="https://github.com/DylanMeeus" rel="me"><i class="fab fa-github fa-lg" aria-hidden="true"></i></a>
+	
+	
+	
+	
+	
+	
+	
+	<a href="https://linkedin.com/in/dylanmeeus" rel="me"><i class="fab fa-linkedin fa-lg" aria-hidden="true"></i></a>
+	
+	
+	
+	
+	
+	
+	
+	
+	
+</section>
+
+      </div>
+    </div>
+    
+
+
+  </div>
+</div>
+
+        <div class="content container">
+            
+    
+<article>
+  <header>
+    <h1>Audio From Scratch With Go: Automated Constant-Power Panning</h1>
+    
+    
+<div class="post__meta">
+    
+    
+      <i class="fas fa-calendar-alt"></i> Aug 06, 2020
+    
+    
+    
+      
+      
+          in
+          
+          
+              <a class="badge badge-category" href="/categories/posts">POSTS</a>
+              
+          
+      
+    
+    
+    
+      
+      
+          <br/>
+           <i class="fas fa-tags"></i>
+          
+          <a class="badge badge-tag" href="/tags/audio">audio</a>
+           
+      
+          <a class="badge badge-tag" href="/tags/go">go</a>
+           
+      
+          <a class="badge badge-tag" href="/tags/goaudio">goaudio</a>
+          
+      
+    
+    
+    <br/>
+    <i class="fas fa-clock"></i> 6 min read
+</div>
+
+
+  </header>
+  
+  
+  <div class="post">
+    <p>In a <a href="https://dylanmeeus.github.io/posts/audio-from-scratch-pt4">previous post</a> we have looked at
+how we can turn a mono audio signal into a stereo signal with an applied pan. One drawback of this
+program was that it was not possible to change the pan throughout the track, meaning that once a pan
+had been selected it would be applied to the entire song.</p>
+<p>Now that we have <a href="https://dylanmeeus.github.io/posts/audio-from-scratch-pt5">implemented breakpoints</a>, we
+can start looking at changing the pan (and other properties) throughout the duration of the track.</p>
+<p>In this post we will take a mono audio signal and change the pan from left, to right, to left
+again. To verify our code works as expected it&rsquo;s best to use a clean signal, so for this we will
+once again use a <a href="/audio/sine.wav">mono sine.wav</a>, with a duration of 10 seconds.</p>
+<h1 id="the-breakpoint-file">The breakpoint file</h1>
+<p>Remember that our breakpoint file-format has entries that are pairs of <code>time:value</code>. Let&rsquo;s make a
+breakpoint file that pans from left to right, to left again, and so on until the end of the track.
+We&rsquo;ll call this <code>pan.brk</code>.</p>
+<pre><code>0:-1
+2:1
+4:-1
+6:1
+8:-1
+10:1
+</code></pre><p>Because the values are interpolated, we get a gradual shift from left -&gt; right, and right -&gt; left
+over the course of the track.</p>
+<h1 id="the-code">The Code</h1>
+<p>All the code for this blog can be found on
+<a href="https://github.com/DylanMeeus/GoAudio/tree/master/examples/stereopan">Github</a>.</p>
+<p>Luckily a lot of the code for implementing this program has already been written by us, mostly in
+<a href="https://dylanmeeus.github.io/posts/audio-from-scratch-pt3">Part 4</a> and <a href="https://dylanmeeus.github.io/posts/audio-from-scratch-pt5">Part
+5</a>. The only novel part here is how we
+can correctly call our <code>ValueAt</code> function.</p>
+<p>First, we&rsquo;ll need to add a flag pointing to the breakpoint file, so our flags become:</p>
+<div class="highlight"><div style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4">
+<table style="border-spacing:0;padding:0;margin:0;border:0;width:auto;overflow:auto;display:block;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">4
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">5
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#66d9ef">var</span> (
+	<span style="color:#a6e22e">input</span>  = <span style="color:#a6e22e">flag</span>.<span style="color:#a6e22e">String</span>(<span style="color:#e6db74">&#34;i&#34;</span>, <span style="color:#e6db74">&#34;&#34;</span>, <span style="color:#e6db74">&#34;input file&#34;</span>)
+	<span style="color:#a6e22e">output</span> = <span style="color:#a6e22e">flag</span>.<span style="color:#a6e22e">String</span>(<span style="color:#e6db74">&#34;o&#34;</span>, <span style="color:#e6db74">&#34;&#34;</span>, <span style="color:#e6db74">&#34;output file&#34;</span>)
+	<span style="color:#a6e22e">brkpnt</span> = <span style="color:#a6e22e">flag</span>.<span style="color:#a6e22e">String</span>(<span style="color:#e6db74">&#34;b&#34;</span>, <span style="color:#e6db74">&#34;&#34;</span>, <span style="color:#e6db74">&#34;breakpoint file&#34;</span>)
+)
+</code></pre></td></tr></table>
+</div>
+</div><p>Next we need to create a function that applies a pan with breakpoints. The first steps here are to
+read the content from our breakpoint file, and turn them into actual <code>Breakpoint structs</code>. In the
+last post we have created the <code>ParseBreakpoints</code> function for this.</p>
+<p>In the same file from <a href="https://dylanmeeus.github.com/posts/audio-from-scratch-pt4">Part 4</a>, we can
+add the start of this function. (For brevity, I&rsquo;m leaving out the error handling thus the <code>_</code> are
+unchecked.</p>
+<div class="highlight"><div style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4">
+<table style="border-spacing:0;padding:0;margin:0;border:0;width:auto;overflow:auto;display:block;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 2
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 3
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 4
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 5
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 6
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 7
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 8
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 9
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">10
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">11
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#66d9ef">func</span> <span style="color:#a6e22e">withBreakpointFile</span>() {
+	<span style="color:#a6e22e">flag</span>.<span style="color:#a6e22e">Parse</span>()
+
+	<span style="color:#a6e22e">file</span>, <span style="color:#a6e22e">_</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">os</span>.<span style="color:#a6e22e">Open</span>(<span style="color:#f92672">*</span><span style="color:#a6e22e">brkpnt</span>)
+	<span style="color:#a6e22e">pnts</span>, <span style="color:#a6e22e">_</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">brk</span>.<span style="color:#a6e22e">ParseBreakpoints</span>(<span style="color:#a6e22e">file</span>)
+
+	<span style="color:#75715e">// read the input .wav file
+</span><span style="color:#75715e"></span>	<span style="color:#a6e22e">infile</span> <span style="color:#f92672">:=</span> <span style="color:#f92672">*</span><span style="color:#a6e22e">input</span>
+	<span style="color:#a6e22e">wave</span>, <span style="color:#a6e22e">err</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">wav</span>.<span style="color:#a6e22e">ReadWaveFile</span>(<span style="color:#a6e22e">infile</span>)
+        <span style="color:#f92672">...</span>
+}
+</code></pre></td></tr></table>
+</div>
+</div><p>Now our setup is done, we have our breakpoints and our .wav frames in memory, we need to actually
+manipulate them. Our <code>ValueAt</code> function to figure out the correct pan at each frame takes three
+inputs. <code>([]Breakpoint, frameTime, offset)</code>.  We can ignore offset for now, so only the first two
+are important. Our <code>[]Breakpoint</code> can just be passed from <code>pnts</code>, so then we are left with figuring
+out how to send the correct <code>frameTime</code>.</p>
+<p>Well, to find out how much time there is between frames, we can look at the <code>SampleRate</code> that was
+extracted when reading the <code>.wav</code> input file. Thus our time increment becomese <code>1 / wave.SampleRate</code>.</p>
+<p>When we have our time increment, all that is left is to just iterate over the frames and call
+<code>ValueAt</code> with the correct timestamp. Adding this to our function it becomes:</p>
+<div class="highlight"><div style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4">
+<table style="border-spacing:0;padding:0;margin:0;border:0;width:auto;overflow:auto;display:block;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 2
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 3
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 4
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 5
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 6
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 7
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 8
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 9
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">10
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">11
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">12
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">13
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">14
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">15
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">16
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">17
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">18
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">19
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go">    <span style="color:#f92672">...</span>
+    <span style="color:#a6e22e">timeincr</span> <span style="color:#f92672">:=</span> <span style="color:#ae81ff">1.0</span> <span style="color:#f92672">/</span> float64(<span style="color:#a6e22e">wave</span>.<span style="color:#a6e22e">SampleRate</span>)
+    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">frametime</span> <span style="color:#66d9ef">float64</span>
+    <span style="color:#a6e22e">inframes</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">wave</span>.<span style="color:#a6e22e">Frames</span>
+    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">out</span> []<span style="color:#a6e22e">wav</span>.<span style="color:#a6e22e">Frame</span>
+
+    <span style="color:#66d9ef">for</span> <span style="color:#a6e22e">_</span>, <span style="color:#a6e22e">s</span> <span style="color:#f92672">:=</span> <span style="color:#66d9ef">range</span> <span style="color:#a6e22e">inframes</span> {
+            <span style="color:#75715e">// apply pan
+</span><span style="color:#75715e"></span>            <span style="color:#a6e22e">_</span>, <span style="color:#a6e22e">pos</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">brk</span>.<span style="color:#a6e22e">ValueAt</span>(<span style="color:#a6e22e">pnts</span>, <span style="color:#a6e22e">frametime</span>, <span style="color:#ae81ff">0</span>)
+            <span style="color:#a6e22e">pan</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">calculatePosition</span>(<span style="color:#a6e22e">pos</span>)
+            <span style="color:#a6e22e">out</span> = append(<span style="color:#a6e22e">out</span>, <span style="color:#a6e22e">wav</span>.<span style="color:#a6e22e">Frame</span>(float64(<span style="color:#a6e22e">s</span>)<span style="color:#f92672">*</span><span style="color:#a6e22e">pan</span>.<span style="color:#a6e22e">left</span>))
+            <span style="color:#a6e22e">out</span> = append(<span style="color:#a6e22e">out</span>, <span style="color:#a6e22e">wav</span>.<span style="color:#a6e22e">Frame</span>(float64(<span style="color:#a6e22e">s</span>)<span style="color:#f92672">*</span><span style="color:#a6e22e">pan</span>.<span style="color:#a6e22e">right</span>))
+            <span style="color:#a6e22e">frametime</span> <span style="color:#f92672">+=</span> <span style="color:#a6e22e">timeincr</span>
+    }
+
+    <span style="color:#75715e">// write to stereo file 
+</span><span style="color:#75715e"></span>    <span style="color:#a6e22e">wave</span>.<span style="color:#a6e22e">NumChannels</span> = <span style="color:#ae81ff">2</span>
+    <span style="color:#a6e22e">wav</span>.<span style="color:#a6e22e">WriteFrames</span>(<span style="color:#a6e22e">out</span>, <span style="color:#a6e22e">wave</span>.<span style="color:#a6e22e">WaveFmt</span>, <span style="color:#f92672">*</span><span style="color:#a6e22e">output</span>)
+}
+</code></pre></td></tr></table>
+</div>
+</div><p>We can now test this by running:</p>
+<pre><code>go run main.go -i mono.wav -o stereo.wav -b pan.brk
+</code></pre><p>Which gives us the following result: <a href="/audio/part6/linearpan.wav">pan.wav</a></p>
+<h1 id="examining-the-created-sound">Examining the created sound.</h1>
+<p>If you listened to the panned file, you might have noticed that the sound seems a bit off. As it
+turns out, the pan function that we have implemented was overly simplistic and caused the volume to
+be quite different near the center (balanced left/right) than when it was panned entirely left/right.</p>
+<p>The way to fix this is by implementing a &ldquo;Constant Power Panning&rdquo; function. Such a function makes
+sure that the overall volume is similar, no matter how the signal is panned.</p>
+<p>We can see this by examining the power of the signal given the different amplitudes in each channel.
+The function for this is: <code>sqrt(ampleft*ampleft + ampright*ampright)</code>. Hence for our simple pan in the centre this
+would become: <code>sqrt(0.5*0.5 + 0.5*0.5) = 0.707</code> The power here does not equal 1, yet when we examine
+the same function at the left channel we notice that this is a loss of about ~3dB:</p>
+<pre><code>sqrt(1*1 + 0*0) = 1
+</code></pre><p>Thus the power at the left / right is greater than at the centre. This is fundamentally what we aim
+to fix to get a constant power pan.</p>
+<h1 id="constant-power-panning">Constant Power Panning</h1>
+<p>I&rsquo;ll avoid going deep into the technical details, but this <a href="https://www.cs.cmu.edu/~music/icm-online/readings/panlaws/">page by Carnegie Mellon
+University</a> explains it better than I
+could.</p>
+<p>Our current &lsquo;simple panning&rsquo; function is a Linear Pan, and when we look at the the volumes in each
+channel we get this (also taken from CMU)</p>
+<p><img src="/audio/part6/linearpower.jpg" alt=""></p>
+<p>With a constant power pan however, the volumes in each channel would look like this:</p>
+<p><img src="/audio/part6/constantpower.JPG" alt=""></p>
+<p>You&rsquo;ll notice that whilst the centre is still lower than either side, it is less pronounced and the
+dropoff happens less quickly.</p>
+<p>The functions we can use to obtain this result for left and right channel are:</p>
+<ul>
+<li>left: <code>sqrt(2)/2 * [cos(angle) + sin(angle)]</code></li>
+<li>right: <code>sqrt(2)/2 * [cos(angle) - sing(angle)]</code></li>
+</ul>
+<p>Implementing this in code is rather straightforward, although we do have to keep in mind that the
+trig functions work with radians and thus have to scale our input such that each channel maps to 1/4 of a cycle.</p>
+<div class="highlight"><div style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4">
+<table style="border-spacing:0;padding:0;margin:0;border:0;width:auto;overflow:auto;display:block;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 2
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 3
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 4
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 5
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 6
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 7
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 8
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 9
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">10
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">11
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">12
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">13
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">14
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">15
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">16
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#75715e">// calculateConstantPowerPosition finds the position of each speaker using a constant power function
+</span><span style="color:#75715e"></span><span style="color:#66d9ef">func</span> <span style="color:#a6e22e">calculateConstantPowerPosition</span>(<span style="color:#a6e22e">position</span> <span style="color:#66d9ef">float64</span>) <span style="color:#a6e22e">panposition</span> {
+	<span style="color:#75715e">// half a sinusoid cycle
+</span><span style="color:#75715e"></span>	<span style="color:#66d9ef">var</span> <span style="color:#a6e22e">halfpi</span> <span style="color:#66d9ef">float64</span> = <span style="color:#a6e22e">math</span>.<span style="color:#a6e22e">Pi</span> <span style="color:#f92672">/</span> <span style="color:#ae81ff">2</span>
+	<span style="color:#a6e22e">r</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">math</span>.<span style="color:#a6e22e">Sqrt</span>(<span style="color:#ae81ff">2.0</span>) <span style="color:#f92672">/</span> <span style="color:#ae81ff">2</span>
+
+	<span style="color:#75715e">// scale position to fit in this range
+</span><span style="color:#75715e"></span>	<span style="color:#a6e22e">scaled</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">position</span> <span style="color:#f92672">*</span> <span style="color:#a6e22e">halfpi</span>
+
+	<span style="color:#75715e">// each channel uses 1/4 of a cycle
+</span><span style="color:#75715e"></span>	<span style="color:#a6e22e">angle</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">scaled</span> <span style="color:#f92672">/</span> <span style="color:#ae81ff">2</span>
+	<span style="color:#a6e22e">pos</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">panposition</span>{}
+	<span style="color:#a6e22e">pos</span>.<span style="color:#a6e22e">left</span> = <span style="color:#a6e22e">r</span> <span style="color:#f92672">*</span> (<span style="color:#a6e22e">math</span>.<span style="color:#a6e22e">Cos</span>(<span style="color:#a6e22e">angle</span>) <span style="color:#f92672">-</span> <span style="color:#a6e22e">math</span>.<span style="color:#a6e22e">Sin</span>(<span style="color:#a6e22e">angle</span>))
+	<span style="color:#a6e22e">pos</span>.<span style="color:#a6e22e">right</span> = <span style="color:#a6e22e">r</span> <span style="color:#f92672">*</span> (<span style="color:#a6e22e">math</span>.<span style="color:#a6e22e">Cos</span>(<span style="color:#a6e22e">angle</span>) <span style="color:#f92672">+</span> <span style="color:#a6e22e">math</span>.<span style="color:#a6e22e">Sin</span>(<span style="color:#a6e22e">angle</span>))
+	<span style="color:#66d9ef">return</span> <span style="color:#a6e22e">pos</span>
+}
+</code></pre></td></tr></table>
+</div>
+</div><p>When we replace our <code>simplePan</code> function with this one, we get the following output:</p>
+<p><a href="/audio/part6/constantpower.wav">Constant Power Pan</a></p>
+<p>When we open these files in audacity, we can clearly see the difference in the rise and fall of the
+amplitudes in each channel.</p>
+<p><img src="/audio/part6/audacity.JPG" alt=""></p>
+<p>Next we&rsquo;ll take a look at how we can extract breakpoints from existing soundfiles (as long as they
+are in .WAV file format), and we&rsquo;ll also discuss the performance of the breakpoint function we are
+using.</p>
+<h1 id="resources">Resources</h1>
+<ul>
+<li><a href="https://github.com/DylanMeeus/GoAudio">GoAudio</a></li>
+<li><a href="https://github.com/DylanMeeus/GoAudio/blob/master/breakpoint/breakpoint.go">Breakpoint code</a></li>
+<li><a href="https://github.com/DylanMeeus/GoAudio/tree/master/examples/stereopan">Stereo pan code</a>.</li>
+</ul>
+<hr>
+<p>If you liked this and want to know when I write new posts, the best way to keep up to date is by <a href="https://twitter.com/DylanMeeus">following me on
+twitter</a>. ;-)</p>
+
+  </div>
+  
+
+<div class="navigation navigation-single">
+    
+    <a href="/posts/audio-from-scratch-pt5/" class="navigation-prev">
+      <i aria-hidden="true" class="fa fa-chevron-left"></i>
+      <span class="navigation-tittle">Audio From Scratch With Go: Breakpoints</span>
+    </a>
+    
+    
+</div>
+
+
+  
+
+  
+    
+
+
+</article>
+
+
+        </div>
+        
+    
+
+  
+  
+<script type="application/javascript">
+var doNotTrack = false;
+if (!doNotTrack) {
+	window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+	ga('create', 'UA-172416417-1', 'auto');
+	
+	ga('send', 'pageview');
+}
+</script>
+<script async src='https://www.google-analytics.com/analytics.js'></script>
+
+
+<script defer src="https://use.fontawesome.com/releases/v5.11.2/js/all.js" integrity="sha384-b3ua1l97aVGAPEIe48b4TC60WUQbQaGi2jqAWM90y0OZXZeyaTCWtBTKtjW2GXG1" crossorigin="anonymous"></script>
+
+
+
+
+    
+
+
+
+    </body>
+</html>

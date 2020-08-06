@@ -223,14 +223,41 @@ this post is simple, we want to change the amplitude of a given .wave file.</p>
 <li>ampfac: factor by which we scale the amplitude</li>
 </ul>
 <p>For parsing these arguments we will use the build-in <code>flags</code> package.</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#66d9ef">var</span> (
+<div class="highlight"><div style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4">
+<table style="border-spacing:0;padding:0;margin:0;border:0;width:auto;overflow:auto;display:block;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">4
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">5
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">6
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#66d9ef">var</span> (
 	<span style="color:#a6e22e">input</span>  = <span style="color:#a6e22e">flag</span>.<span style="color:#a6e22e">String</span>(<span style="color:#e6db74">&#34;i&#34;</span>, <span style="color:#e6db74">&#34;&#34;</span>, <span style="color:#e6db74">&#34;input file&#34;</span>)
 	<span style="color:#a6e22e">output</span> = <span style="color:#a6e22e">flag</span>.<span style="color:#a6e22e">String</span>(<span style="color:#e6db74">&#34;o&#34;</span>, <span style="color:#e6db74">&#34;&#34;</span>, <span style="color:#e6db74">&#34;output file&#34;</span>)
 	<span style="color:#a6e22e">amp</span>    = <span style="color:#a6e22e">flag</span>.<span style="color:#a6e22e">Float64</span>(<span style="color:#e6db74">&#34;a&#34;</span>, <span style="color:#ae81ff">1.0</span>, <span style="color:#e6db74">&#34;amp mod factor&#34;</span>)
 )
 
-</code></pre></div><p>Next we want to parse these values, and read the audio data from the input file.</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#66d9ef">func</span> <span style="color:#a6e22e">main</span>() {
+</code></pre></td></tr></table>
+</div>
+</div><p>Next we want to parse these values, and read the audio data from the input file.</p>
+<div class="highlight"><div style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4">
+<table style="border-spacing:0;padding:0;margin:0;border:0;width:auto;overflow:auto;display:block;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 2
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 3
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 4
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 5
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 6
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 7
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 8
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 9
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">10
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">11
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#66d9ef">func</span> <span style="color:#a6e22e">main</span>() {
 	<span style="color:#a6e22e">flag</span>.<span style="color:#a6e22e">Parse</span>()
 	<span style="color:#a6e22e">infile</span> <span style="color:#f92672">:=</span> <span style="color:#f92672">*</span><span style="color:#a6e22e">input</span>
 	<span style="color:#a6e22e">outfile</span> <span style="color:#f92672">:=</span> <span style="color:#f92672">*</span><span style="color:#a6e22e">output</span>
@@ -241,28 +268,55 @@ this post is simple, we want to change the amplitude of a given .wave file.</p>
 	}
         <span style="color:#f92672">...</span>
 }
-</code></pre></div><p>So now how do we go about actually changing the amplitude of the audio file we just read?</p>
+</code></pre></td></tr></table>
+</div>
+</div><p>So now how do we go about actually changing the amplitude of the audio file we just read?</p>
 <p>Well, inside the audio file we have raw audio data (of type <code>Sample = float64</code>). These float64
 sample values represent the amplitudes at different points in time. So in order to manipulate the
 amplitude we have to manipulate these values.</p>
 <p>We  can fill out the main method like so:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go">	<span style="color:#a6e22e">scaledSamples</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">changeAmplitude</span>(<span style="color:#a6e22e">wave</span>.<span style="color:#a6e22e">Samples</span>, <span style="color:#a6e22e">scale</span>)
+<div class="highlight"><div style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4">
+<table style="border-spacing:0;padding:0;margin:0;border:0;width:auto;overflow:auto;display:block;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">4
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">5
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">6
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">7
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go">	<span style="color:#a6e22e">scaledSamples</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">changeAmplitude</span>(<span style="color:#a6e22e">wave</span>.<span style="color:#a6e22e">Samples</span>, <span style="color:#a6e22e">scale</span>)
 	<span style="color:#66d9ef">if</span> <span style="color:#a6e22e">err</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">pkg</span>.<span style="color:#a6e22e">WriteSamples</span>(<span style="color:#a6e22e">scaledSamples</span>, <span style="color:#a6e22e">wave</span>.<span style="color:#a6e22e">WaveFmt</span>, <span style="color:#a6e22e">outfile</span>); <span style="color:#a6e22e">err</span> <span style="color:#f92672">!=</span> <span style="color:#66d9ef">nil</span> {
 		panic(<span style="color:#a6e22e">err</span>)
 	}
 	<span style="color:#a6e22e">fmt</span>.<span style="color:#a6e22e">Println</span>(<span style="color:#e6db74">&#34;done&#34;</span>)
 
 }
-</code></pre></div><p>Here we have just called a function &ldquo;changeAmplitude&rdquo; that requires us to pass Samples and a scale
+</code></pre></td></tr></table>
+</div>
+</div><p>Here we have just called a function &ldquo;changeAmplitude&rdquo; that requires us to pass Samples and a scale
 factor, and returns us new samples.</p>
 <p>As mentioned, we can just alter the samples themselves to change the amplitudes.</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#66d9ef">func</span> <span style="color:#a6e22e">changeAmplitude</span>(<span style="color:#a6e22e">samples</span> []<span style="color:#a6e22e">pkg</span>.<span style="color:#a6e22e">Sample</span>, <span style="color:#a6e22e">scalefactor</span> <span style="color:#66d9ef">float64</span>) []<span style="color:#a6e22e">pkg</span>.<span style="color:#a6e22e">Sample</span> {
+<div class="highlight"><div style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4">
+<table style="border-spacing:0;padding:0;margin:0;border:0;width:auto;overflow:auto;display:block;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">4
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">5
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">6
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#66d9ef">func</span> <span style="color:#a6e22e">changeAmplitude</span>(<span style="color:#a6e22e">samples</span> []<span style="color:#a6e22e">pkg</span>.<span style="color:#a6e22e">Sample</span>, <span style="color:#a6e22e">scalefactor</span> <span style="color:#66d9ef">float64</span>) []<span style="color:#a6e22e">pkg</span>.<span style="color:#a6e22e">Sample</span> {
 	<span style="color:#66d9ef">for</span> <span style="color:#a6e22e">i</span>, <span style="color:#a6e22e">s</span> <span style="color:#f92672">:=</span> <span style="color:#66d9ef">range</span> <span style="color:#a6e22e">samples</span> {
 		<span style="color:#a6e22e">samples</span>[<span style="color:#a6e22e">i</span>] = <span style="color:#a6e22e">pkg</span>.<span style="color:#a6e22e">Sample</span>(float64(<span style="color:#a6e22e">s</span>) <span style="color:#f92672">*</span> <span style="color:#a6e22e">scalefactor</span>)
 	}
 	<span style="color:#66d9ef">return</span> <span style="color:#a6e22e">samples</span>
 }
-</code></pre></div><p>And that&rsquo;s all there is to it. Given a scale factor that the user passes, we multiple each sample by
+</code></pre></td></tr></table>
+</div>
+</div><p>And that&rsquo;s all there is to it. Given a scale factor that the user passes, we multiple each sample by
 this factor to get a new sample. At the end, we return our new samples and write them to the output
 file. The actual writing of these samples to a wave file is again taken care of by our
 <a href="https://github.com/DylanMeeus/GoAudio">GoAudio library</a>.</p>

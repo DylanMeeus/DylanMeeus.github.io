@@ -6,10 +6,20 @@
     <description>Recent content in Posts on Dylan Meeus</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Tue, 28 Jul 2020 20:31:44 +0200</lastBuildDate>
+    <lastBuildDate>Thu, 06 Aug 2020 20:05:53 +0200</lastBuildDate>
     
 	<atom:link href="https://dylanmeeus.github.io/posts/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>Audio From Scratch With Go: Automated Constant-Power Panning</title>
+      <link>https://dylanmeeus.github.io/posts/audio-from-scratch-pt6/</link>
+      <pubDate>Thu, 06 Aug 2020 20:05:53 +0200</pubDate>
+      
+      <guid>https://dylanmeeus.github.io/posts/audio-from-scratch-pt6/</guid>
+      <description>In a previous post we have looked at how we can turn a mono audio signal into a stereo signal with an applied pan. One drawback of this program was that it was not possible to change the pan throughout the track, meaning that once a pan had been selected it would be applied to the entire song.
+Now that we have implemented breakpoints, we can start looking at changing the pan (and other properties) throughout the duration of the track.</description>
+    </item>
     
     <item>
       <title>Audio From Scratch With Go: Breakpoints</title>

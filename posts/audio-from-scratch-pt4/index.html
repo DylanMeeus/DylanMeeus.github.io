@@ -199,7 +199,7 @@ if (!doNotTrack) {
     
     
     <br/>
-    <i class="fas fa-clock"></i> 5 min read
+    <i class="fas fa-clock"></i> 6 min read
 </div>
 
 
@@ -250,18 +250,53 @@ generate a stereo file. The pan variable should be between -1 (left) and 1 (righ
 start applying our pan, we need to read the raw audio data from an input wave file. Remember that to
 read the wave file we will use the <a href="https://github.com/DylanMeeus/GoAudio">GoAudio</a> library we made
 earlier:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#f92672">import</span> (
+<div class="highlight"><div style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4">
+<table style="border-spacing:0;padding:0;margin:0;border:0;width:auto;overflow:auto;display:block;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#f92672">import</span> (
         <span style="color:#a6e22e">wav</span> <span style="color:#e6db74">&#34;github.com/DylanMeeus/GoAudio/wave&#34;</span>
 )
-</code></pre></div><p>The set up for this program is rather simple, we will use the build-in <code>flags</code> package to parse the
+</code></pre></td></tr></table>
+</div>
+</div><p>The set up for this program is rather simple, we will use the build-in <code>flags</code> package to parse the
 input from the CLI.</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#66d9ef">var</span> (
+<div class="highlight"><div style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4">
+<table style="border-spacing:0;padding:0;margin:0;border:0;width:auto;overflow:auto;display:block;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">4
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">5
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#66d9ef">var</span> (
 	<span style="color:#a6e22e">input</span>  = <span style="color:#a6e22e">flag</span>.<span style="color:#a6e22e">String</span>(<span style="color:#e6db74">&#34;i&#34;</span>, <span style="color:#e6db74">&#34;&#34;</span>, <span style="color:#e6db74">&#34;input file&#34;</span>)
 	<span style="color:#a6e22e">output</span> = <span style="color:#a6e22e">flag</span>.<span style="color:#a6e22e">String</span>(<span style="color:#e6db74">&#34;o&#34;</span>, <span style="color:#e6db74">&#34;&#34;</span>, <span style="color:#e6db74">&#34;output file&#34;</span>)
 	<span style="color:#a6e22e">pan</span>    = <span style="color:#a6e22e">flag</span>.<span style="color:#a6e22e">Float64</span>(<span style="color:#e6db74">&#34;p&#34;</span>, <span style="color:#ae81ff">0.0</span>, <span style="color:#e6db74">&#34;pan in range of -1 (left) to 1 (right)&#34;</span>)
 )
-</code></pre></div><p>Once we have our flags set up, we can parse them and read the input file.</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#66d9ef">func</span> <span style="color:#a6e22e">main</span>() {
+</code></pre></td></tr></table>
+</div>
+</div><p>Once we have our flags set up, we can parse them and read the input file.</p>
+<div class="highlight"><div style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4">
+<table style="border-spacing:0;padding:0;margin:0;border:0;width:auto;overflow:auto;display:block;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 2
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 3
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 4
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 5
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 6
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 7
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 8
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 9
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">10
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">11
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#66d9ef">func</span> <span style="color:#a6e22e">main</span>() {
 	<span style="color:#a6e22e">flag</span>.<span style="color:#a6e22e">Parse</span>()
 	<span style="color:#a6e22e">infile</span> <span style="color:#f92672">:=</span> <span style="color:#f92672">*</span><span style="color:#a6e22e">input</span>
 	<span style="color:#a6e22e">outfile</span> <span style="color:#f92672">:=</span> <span style="color:#f92672">*</span><span style="color:#a6e22e">output</span>
@@ -272,11 +307,28 @@ input from the CLI.</p>
 	}
         <span style="color:#f92672">...</span>
 }
-</code></pre></div><p>So far so good. We have parsed the input so we know which value to use for our pan, and we have read
+</code></pre></td></tr></table>
+</div>
+</div><p>So far so good. We have parsed the input so we know which value to use for our pan, and we have read
 the raw audio data as well. But how do we go from a value in the range of (-1) to (1) to an actual
 change in loudness on the left or right-side? We can imagine that a simple function would look like
 this:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#66d9ef">type</span> <span style="color:#a6e22e">panposition</span> <span style="color:#66d9ef">struct</span> {
+<div class="highlight"><div style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4">
+<table style="border-spacing:0;padding:0;margin:0;border:0;width:auto;overflow:auto;display:block;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 2
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 3
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 4
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 5
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 6
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 7
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 8
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 9
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">10
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">11
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#66d9ef">type</span> <span style="color:#a6e22e">panposition</span> <span style="color:#66d9ef">struct</span> {
 	<span style="color:#a6e22e">left</span>, <span style="color:#a6e22e">right</span> <span style="color:#66d9ef">float64</span>
 }
 
@@ -287,7 +339,9 @@ this:</p>
 		<span style="color:#a6e22e">right</span>: <span style="color:#a6e22e">position</span> <span style="color:#f92672">+</span> <span style="color:#ae81ff">0.5</span>,
 	}
 }
-</code></pre></div><p>Here we are using a struct that can represent the amplitude on a scale of 0 to 1 for both the left
+</code></pre></td></tr></table>
+</div>
+</div><p>Here we are using a struct that can represent the amplitude on a scale of 0 to 1 for both the left
 and right channel. Such that we observe the following values:</p>
 <table>
 <thead>
@@ -321,7 +375,19 @@ right-sided.</p>
 <p>Just like in the previous post, we actually need to alter the frames based on the position data we
 found in the <code>calculatePosition</code> function. We can create a function that modifies the frames based
 on the <code>panposition</code> returned in the previous function.</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#66d9ef">func</span> <span style="color:#a6e22e">applyPan</span>(<span style="color:#a6e22e">frames</span> []<span style="color:#a6e22e">wav</span>.<span style="color:#a6e22e">Frame</span>, <span style="color:#a6e22e">p</span> <span style="color:#a6e22e">panposition</span>) []<span style="color:#a6e22e">wav</span>.<span style="color:#a6e22e">Frame</span> {
+<div class="highlight"><div style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4">
+<table style="border-spacing:0;padding:0;margin:0;border:0;width:auto;overflow:auto;display:block;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">4
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">5
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">6
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">7
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">8
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#66d9ef">func</span> <span style="color:#a6e22e">applyPan</span>(<span style="color:#a6e22e">frames</span> []<span style="color:#a6e22e">wav</span>.<span style="color:#a6e22e">Frame</span>, <span style="color:#a6e22e">p</span> <span style="color:#a6e22e">panposition</span>) []<span style="color:#a6e22e">wav</span>.<span style="color:#a6e22e">Frame</span> {
 	<span style="color:#a6e22e">out</span> <span style="color:#f92672">:=</span> []<span style="color:#a6e22e">wav</span>.<span style="color:#a6e22e">Frame</span>{}
 	<span style="color:#66d9ef">for</span> <span style="color:#a6e22e">_</span>, <span style="color:#a6e22e">s</span> <span style="color:#f92672">:=</span> <span style="color:#66d9ef">range</span> <span style="color:#a6e22e">frames</span> {
 		<span style="color:#a6e22e">out</span> = append(<span style="color:#a6e22e">out</span>, <span style="color:#a6e22e">wav</span>.<span style="color:#a6e22e">Frame</span>(float64(<span style="color:#a6e22e">s</span>)<span style="color:#f92672">*</span><span style="color:#a6e22e">p</span>.<span style="color:#a6e22e">left</span>))
@@ -329,17 +395,32 @@ on the <code>panposition</code> returned in the previous function.</p>
 	}
 	<span style="color:#66d9ef">return</span> <span style="color:#a6e22e">out</span>
 }
-</code></pre></div><p>Notice how for each <code>frame</code> we actually append two <code>frames</code> to the resulting slice! That is how we
+</code></pre></td></tr></table>
+</div>
+</div><p>Notice how for each <code>frame</code> we actually append two <code>frames</code> to the resulting slice! That is how we
 are interleaving the left and right audio channel.</p>
 <p>Now we can finish up the main method:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go">        <span style="color:#f92672">...</span>
+<div class="highlight"><div style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4">
+<table style="border-spacing:0;padding:0;margin:0;border:0;width:auto;overflow:auto;display:block;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">4
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">5
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">6
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">7
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go">        <span style="color:#f92672">...</span>
 	<span style="color:#a6e22e">pos</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">calculatePosition</span>(<span style="color:#a6e22e">panfac</span>)
 	<span style="color:#a6e22e">scaledFrames</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">applyPan</span>(<span style="color:#a6e22e">wave</span>.<span style="color:#a6e22e">Frames</span>, <span style="color:#a6e22e">calculatePosition</span>(<span style="color:#a6e22e">panfac</span>))
 	<span style="color:#a6e22e">wave</span>.<span style="color:#a6e22e">NumChannels</span> = <span style="color:#ae81ff">2</span> <span style="color:#75715e">// samples are now stereo, so we need dual channels
 </span><span style="color:#75715e"></span>	<span style="color:#66d9ef">if</span> <span style="color:#a6e22e">err</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">wav</span>.<span style="color:#a6e22e">WriteFrames</span>(<span style="color:#a6e22e">scaledFrames</span>, <span style="color:#a6e22e">wave</span>.<span style="color:#a6e22e">WaveFmt</span>, <span style="color:#a6e22e">outfile</span>); <span style="color:#a6e22e">err</span> <span style="color:#f92672">!=</span> <span style="color:#66d9ef">nil</span> {
 		panic(<span style="color:#a6e22e">err</span>)
 	}
-</code></pre></div><p>A crucial step here is that before writing the samples we have set ran <code>wave.NumChannels=2</code>. Without
+</code></pre></td></tr></table>
+</div>
+</div><p>A crucial step here is that before writing the samples we have set ran <code>wave.NumChannels=2</code>. Without
 this, the wave file would be interpreted as a mono sound file and our panning effect would have been
 lost.</p>
 <h1 id="testing-the-code">Testing the code</h1>

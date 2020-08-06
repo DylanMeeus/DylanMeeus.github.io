@@ -305,14 +305,62 @@ abstraction of this and just accept an <code>io.Reader</code> instead.</p>
 <p>Our breakpoint time-value pars will be encoded like <code>time:value</code>. Although you could use a different
 separator if you want to, it&rsquo;ll just be a minor adjustment to the code.</p>
 <p>First we can define our breakpoint type:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#66d9ef">type</span> <span style="color:#a6e22e">Breakpoint</span> <span style="color:#66d9ef">struct</span> {
+<div class="highlight"><div style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4">
+<table style="border-spacing:0;padding:0;margin:0;border:0;width:auto;overflow:auto;display:block;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#66d9ef">type</span> <span style="color:#a6e22e">Breakpoint</span> <span style="color:#66d9ef">struct</span> {
         <span style="color:#a6e22e">Time</span>, <span style="color:#a6e22e">Value</span> <span style="color:#66d9ef">float64</span>
 }
-</code></pre></div><p>Hence we take some input from an io.Reader, we parse it into separate lines. Then for each line we
+</code></pre></td></tr></table>
+</div>
+</div><p>Hence we take some input from an io.Reader, we parse it into separate lines. Then for each line we
 split on our separator (<code>:</code>) and turn these values into <code>float64</code> values. These get bundled up into
 our <code>Breakpoint</code> struct and then added to a slice called <code>[]Breakpoint</code> which we will return to the
 user. This code could use some slice bounds checks, but this way it is easier to read for this post</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#66d9ef">func</span> <span style="color:#a6e22e">ParseBreakpoints</span>(<span style="color:#a6e22e">in</span> <span style="color:#a6e22e">io</span>.<span style="color:#a6e22e">Reader</span>) ([]<span style="color:#a6e22e">Breakpoint</span>, <span style="color:#66d9ef">error</span>) {
+<div class="highlight"><div style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4">
+<table style="border-spacing:0;padding:0;margin:0;border:0;width:auto;overflow:auto;display:block;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 2
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 3
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 4
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 5
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 6
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 7
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 8
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 9
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">10
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">11
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">12
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">13
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">14
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">15
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">16
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">17
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">18
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">19
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">20
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">21
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">22
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">23
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">24
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">25
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">26
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">27
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">28
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">29
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">30
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">31
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">32
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">33
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">34
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">35
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#66d9ef">func</span> <span style="color:#a6e22e">ParseBreakpoints</span>(<span style="color:#a6e22e">in</span> <span style="color:#a6e22e">io</span>.<span style="color:#a6e22e">Reader</span>) ([]<span style="color:#a6e22e">Breakpoint</span>, <span style="color:#66d9ef">error</span>) {
 	<span style="color:#a6e22e">data</span>, <span style="color:#a6e22e">err</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">ioutil</span>.<span style="color:#a6e22e">ReadAll</span>(<span style="color:#a6e22e">in</span>)
 	<span style="color:#66d9ef">if</span> <span style="color:#a6e22e">err</span> <span style="color:#f92672">!=</span> <span style="color:#66d9ef">nil</span> {
 		<span style="color:#66d9ef">return</span> <span style="color:#66d9ef">nil</span>, <span style="color:#a6e22e">err</span>
@@ -347,7 +395,9 @@ user. This code could use some slice bounds checks, but this way it is easier to
 	}
 	<span style="color:#66d9ef">return</span> <span style="color:#a6e22e">brkpnts</span>, <span style="color:#66d9ef">nil</span>
 }
-</code></pre></div><h1 id="finding-the-correct-value">Finding the correct value</h1>
+</code></pre></td></tr></table>
+</div>
+</div><h1 id="finding-the-correct-value">Finding the correct value</h1>
 <p>The other important part for our breakpoint module is to actually return a value given a slice of
 breakpoints and a requested time. As mentioned earlier, this will be done with linear interpolation
 on the values that we find for a given span. The first edge case we need to think about: What if
@@ -355,7 +405,26 @@ our data point lies <em>after</em> the last entry? In this case, no interpolatio
 just return the last value.</p>
 <p>The first step will be to find the correct span. We can iterate over all Time-Value pairs until we
 have exceeded the <code>Time</code> part, thus knowing that the last Time we saw is the &lsquo;start&rsquo; of our span.</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#66d9ef">func</span> <span style="color:#a6e22e">ValueAt</span>(<span style="color:#a6e22e">bs</span> []<span style="color:#a6e22e">Breakpoint</span>, <span style="color:#a6e22e">time</span> <span style="color:#66d9ef">float64</span>, <span style="color:#a6e22e">startIndex</span> <span style="color:#66d9ef">int</span>) (<span style="color:#a6e22e">index</span> <span style="color:#66d9ef">int</span>, <span style="color:#a6e22e">value</span> <span style="color:#66d9ef">float64</span>) {
+<div class="highlight"><div style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4">
+<table style="border-spacing:0;padding:0;margin:0;border:0;width:auto;overflow:auto;display:block;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 2
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 3
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 4
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 5
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 6
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 7
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 8
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 9
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">10
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">11
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">12
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">13
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">14
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">15
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#66d9ef">func</span> <span style="color:#a6e22e">ValueAt</span>(<span style="color:#a6e22e">bs</span> []<span style="color:#a6e22e">Breakpoint</span>, <span style="color:#a6e22e">time</span> <span style="color:#66d9ef">float64</span>, <span style="color:#a6e22e">startIndex</span> <span style="color:#66d9ef">int</span>) (<span style="color:#a6e22e">index</span> <span style="color:#66d9ef">int</span>, <span style="color:#a6e22e">value</span> <span style="color:#66d9ef">float64</span>) {
 	<span style="color:#66d9ef">if</span> len(<span style="color:#a6e22e">bs</span>) <span style="color:#f92672">==</span> <span style="color:#ae81ff">0</span> {
 		<span style="color:#66d9ef">return</span> <span style="color:#ae81ff">0</span>, <span style="color:#ae81ff">0</span>
 	}
@@ -370,17 +439,31 @@ have exceeded the <code>Time</code> part, thus knowing that the last Time we saw
 		<span style="color:#a6e22e">startSpan</span><span style="color:#f92672">++</span>
 	}
         <span style="color:#f92672">...</span>
-</code></pre></div><p>With this code we have found the correct startSpan, and we also have a small guard statement in case
+</code></pre></td></tr></table>
+</div>
+</div><p>With this code we have found the correct startSpan, and we also have a small guard statement in case
 there are no breakpoints being passed.</p>
 <p>The first edge case can be handled here, if our <code>startSpan</code> is larger than the amount of breakpoints in
 the slice, we can just return the value of the last breakpoint we encountered in the loop.</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go">
+<div class="highlight"><div style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4">
+<table style="border-spacing:0;padding:0;margin:0;border:0;width:auto;overflow:auto;display:block;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">4
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">5
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">6
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go">
 	<span style="color:#75715e">// Our span is never-ending (the last point in our breakpoint file was hit)
 </span><span style="color:#75715e"></span>	<span style="color:#66d9ef">if</span> <span style="color:#a6e22e">startSpan</span> <span style="color:#f92672">==</span> <span style="color:#a6e22e">npoints</span> {
 		<span style="color:#66d9ef">return</span> <span style="color:#a6e22e">startSpan</span>, <span style="color:#a6e22e">bs</span>[<span style="color:#a6e22e">startSpan</span><span style="color:#f92672">-</span><span style="color:#ae81ff">1</span>].<span style="color:#a6e22e">Value</span>
 	}
 
-</code></pre></div><p>Now that we have taken care of this edge case, we actually can retrieve a span. And we hit the
+</code></pre></td></tr></table>
+</div>
+</div><p>Now that we have taken care of this edge case, we actually can retrieve a span. And we hit the
 second edge-case, what if the two times in our breakpoint are the same? Imagine this:</p>
 <table>
 <thead>
@@ -404,18 +487,39 @@ second edge-case, what if the two times in our breakpoint are the same? Imagine 
 the last entry. Thus in our example, The result would be <code>-1</code>. This could be the case if the user
 would want a gradual rise to the value <code>1</code> in the first 5 seconds, and then an immediate jump to
 <code>-1</code>. This can be detected if the &lsquo;distance&rsquo; between our two timestamps is zero.</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go">	<span style="color:#75715e">// check for instant jump
+<div class="highlight"><div style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4">
+<table style="border-spacing:0;padding:0;margin:0;border:0;width:auto;overflow:auto;display:block;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">4
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">5
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">6
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go">	<span style="color:#75715e">// check for instant jump
 </span><span style="color:#75715e"></span>	<span style="color:#a6e22e">width</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">right</span>.<span style="color:#a6e22e">Time</span> <span style="color:#f92672">-</span> <span style="color:#a6e22e">left</span>.<span style="color:#a6e22e">Time</span>
 
 	<span style="color:#66d9ef">if</span> <span style="color:#a6e22e">width</span> <span style="color:#f92672">==</span> <span style="color:#ae81ff">0</span> {
 		<span style="color:#66d9ef">return</span> <span style="color:#a6e22e">startSpan</span>, <span style="color:#a6e22e">right</span>.<span style="color:#a6e22e">Value</span>
 	}
-</code></pre></div><p>Finally we get past the &lsquo;edge cases&rsquo; and end up at the interpolation part. We can finish the
+</code></pre></td></tr></table>
+</div>
+</div><p>Finally we get past the &lsquo;edge cases&rsquo; and end up at the interpolation part. We can finish the
 function with this using the <code>width</code> we calculated above:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go">	<span style="color:#a6e22e">frac</span> <span style="color:#f92672">:=</span> (<span style="color:#a6e22e">time</span> <span style="color:#f92672">-</span> <span style="color:#a6e22e">left</span>.<span style="color:#a6e22e">Time</span>) <span style="color:#f92672">/</span> <span style="color:#a6e22e">width</span>
+<div class="highlight"><div style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4">
+<table style="border-spacing:0;padding:0;margin:0;border:0;width:auto;overflow:auto;display:block;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go">	<span style="color:#a6e22e">frac</span> <span style="color:#f92672">:=</span> (<span style="color:#a6e22e">time</span> <span style="color:#f92672">-</span> <span style="color:#a6e22e">left</span>.<span style="color:#a6e22e">Time</span>) <span style="color:#f92672">/</span> <span style="color:#a6e22e">width</span>
 	<span style="color:#a6e22e">val</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">left</span>.<span style="color:#a6e22e">Value</span> <span style="color:#f92672">+</span> ((<span style="color:#a6e22e">right</span>.<span style="color:#a6e22e">Value</span> <span style="color:#f92672">-</span> <span style="color:#a6e22e">left</span>.<span style="color:#a6e22e">Value</span>) <span style="color:#f92672">*</span> <span style="color:#a6e22e">frac</span>)
 	<span style="color:#66d9ef">return</span> <span style="color:#a6e22e">startSpan</span>, <span style="color:#a6e22e">val</span>
-</code></pre></div><p>Great, with this we are all set to start working on our first automation track!</p>
+</code></pre></td></tr></table>
+</div>
+</div><p>Great, with this we are all set to start working on our first automation track!</p>
 <h1 id="resources">Resources</h1>
 <ul>
 <li><a href="https://github.com/DylanMeeus/GoAudio">GoAudio</a></li>
@@ -435,6 +539,11 @@ twitter</a>. ;-)</p>
       <span class="navigation-tittle">Audio From Scratch With Go: Stereo panning</span>
     </a>
     
+    
+    <a href="/posts/audio-from-scratch-pt6/" class="navigation-next">
+      <span class="navigation-tittle">Audio From Scratch With Go: Automated Constant-Power Panning</span>
+      <i aria-hidden="true" class="fa fa-chevron-right"></i>
+    </a>
     
 </div>
 
