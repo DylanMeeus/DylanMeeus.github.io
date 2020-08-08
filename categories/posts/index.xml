@@ -6,10 +6,20 @@
     <description>Recent content in posts on Dylan Meeus</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Thu, 06 Aug 2020 20:05:53 +0200</lastBuildDate>
+    <lastBuildDate>Sat, 08 Aug 2020 01:01:37 +0200</lastBuildDate>
     
 	<atom:link href="https://dylanmeeus.github.io/categories/posts/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>Audio From Scratch With Go: Extracting Breakpoints from songs</title>
+      <link>https://dylanmeeus.github.io/posts/audio-from-scratch-pt7/</link>
+      <pubDate>Sat, 08 Aug 2020 01:01:37 +0200</pubDate>
+      
+      <guid>https://dylanmeeus.github.io/posts/audio-from-scratch-pt7/</guid>
+      <description>So far everything we&amp;rsquo;ve done with breakpoints involved us creating a breakpoint file and using this to automate part of a track. Now we&amp;rsquo;ll take a look at how we can take an existing track and extract some breakpoints from this. For this post, we&amp;rsquo;ll take a look at extracting the amplitudes from the .wave files, as this is one of the most straightforward properties that we can extract.
+There is nothing here that we&amp;rsquo;ve not seen in the previous posts, but rather we are going to combine what we&amp;rsquo;ve already learned to create a new tool to do this.</description>
+    </item>
     
     <item>
       <title>Audio From Scratch With Go: Automated Constant-Power Panning</title>
