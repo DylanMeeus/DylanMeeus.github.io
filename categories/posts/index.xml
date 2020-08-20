@@ -6,10 +6,20 @@
     <description>Recent content in posts on Dylan Meeus</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Sat, 08 Aug 2020 01:01:37 +0200</lastBuildDate>
+    <lastBuildDate>Wed, 19 Aug 2020 20:45:50 +0200</lastBuildDate>
     
 	<atom:link href="https://dylanmeeus.github.io/categories/posts/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>Audio From Scratch With Go: Waveform synthesis</title>
+      <link>https://dylanmeeus.github.io/posts/audio-from-scratch-pt8/</link>
+      <pubDate>Wed, 19 Aug 2020 20:45:50 +0200</pubDate>
+      
+      <guid>https://dylanmeeus.github.io/posts/audio-from-scratch-pt8/</guid>
+      <description>In the previous posts we first looked at how we can generate a sine wave as raw floats and interpret with ffplay. Later we explored how to read / write .wave files and how to extract and create &amp;lsquo;automation tracks&amp;rsquo; using breakpoints.
+As you might have noticed, we&amp;rsquo;ve never actually created .wave files from scratch with our own sound data. And, that&amp;rsquo;s about to change now. In this blogpost we&amp;rsquo;ll look at how we can create a variety of basic soundwaves.</description>
+    </item>
     
     <item>
       <title>Audio From Scratch With Go: Extracting Breakpoints</title>

@@ -1,0 +1,688 @@
+<!DOCTYPE html>
+<html lang="en-us">
+    
+    
+
+
+    <head>
+    <link href="https://gmpg.org/xfn/11" rel="profile">
+    <meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta http-equiv="Cache-Control" content="public" />
+<!-- Enable responsiveness on mobile devices -->
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+<meta name="generator" content="Hugo 0.73.0" />
+
+    
+    
+    
+
+<title>Audio From Scratch With Go: Waveform synthesis • Dylan Meeus</title>
+
+
+<meta name="twitter:card" content="summary_large_image"/>
+<meta name="twitter:image" content="https://dylanmeeus.github.io/audio/part8/waves.png"/>
+
+<meta name="twitter:title" content="Audio From Scratch With Go: Waveform synthesis"/>
+<meta name="twitter:description" content="In the previous posts we first looked at how we can generate a sine wave as raw floats and interpret with ffplay. Later we explored how to read / write .wave files and how to extract and create &lsquo;automation tracks&rsquo; using breakpoints.
+As you might have noticed, we&rsquo;ve never actually created .wave files from scratch with our own sound data. And, that&rsquo;s about to change now. In this blogpost we&rsquo;ll look at how we can create a variety of basic soundwaves."/>
+<meta name="twitter:site" content="@DylanMeeus"/>
+
+<meta property="og:title" content="Audio From Scratch With Go: Waveform synthesis" />
+<meta property="og:description" content="In the previous posts we first looked at how we can generate a sine wave as raw floats and interpret with ffplay. Later we explored how to read / write .wave files and how to extract and create &lsquo;automation tracks&rsquo; using breakpoints.
+As you might have noticed, we&rsquo;ve never actually created .wave files from scratch with our own sound data. And, that&rsquo;s about to change now. In this blogpost we&rsquo;ll look at how we can create a variety of basic soundwaves." />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://dylanmeeus.github.io/posts/audio-from-scratch-pt8/" />
+<meta property="og:image" content="https://dylanmeeus.github.io/audio/part8/waves.png" />
+<meta property="article:published_time" content="2020-08-19T20:45:50+02:00" />
+<meta property="article:modified_time" content="2020-08-19T20:45:50+02:00" />
+
+
+    
+
+
+
+
+
+
+<link rel="stylesheet" href="/scss/hyde-hyde.6a83d62c39a364f036df4db1ecd564645635d6c7fc182425cb501218fec485f5.css" integrity="sha256-aoPWLDmjZPA2302x7NVkZFY11sf8GCQly1ASGP7EhfU=">
+
+
+<link rel="stylesheet" href="/scss/print.2744dcbf8a0b2e74f8a50e4b34e5f441be7cf93cc7de27029121c6a09f9e77bc.css" integrity="sha256-J0Tcv4oLLnT4pQ5LNOX0Qb58&#43;TzH3icCkSHGoJ&#43;ed7w=" media="print">
+
+
+
+
+    
+<script type="application/javascript">
+var doNotTrack = false;
+if (!doNotTrack) {
+	(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+	(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+	m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+	})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+	ga('create', 'UA-172416417-1', 'auto');
+	
+	ga('send', 'pageview');
+}
+</script>
+
+    
+<script type="application/javascript">
+var doNotTrack = false;
+if (!doNotTrack) {
+	window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+	ga('create', 'UA-172416417-1', 'auto');
+	
+	ga('send', 'pageview');
+}
+</script>
+<script async src='https://www.google-analytics.com/analytics.js'></script>
+
+
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+    <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
+    <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+    <!-- Icons -->
+    <link rel="apple-touch-icon-precomposed" sizes="144x144" href="/apple-touch-icon-144-precomposed.png">
+    <link rel="shortcut icon" href="/favicon.png">
+    
+    
+
+</head>
+
+
+    <body class=" ">
+    
+<div class="sidebar">
+  <div class="container ">
+    <div class="sidebar-about">
+      <span class="site__title">
+        <a href="https://dylanmeeus.github.io">Dylan Meeus</a>
+      </span>
+      
+      
+        <div class="author-image">
+          <img src="https://www.gravatar.com/avatar/174fdce3b3920fc7b21aff714b0b664d?s=240&d=mp" class="img--circle img--headshot element--center" alt="gravatar">
+        </div>
+      
+      <p class="site__description">
+        
+      </p>
+    </div>
+    <div class="collapsible-menu">
+      <input type="checkbox" id="menuToggle">
+      <label for="menuToggle">Dylan Meeus</label>
+      <div class="menu-content">
+        <div>
+	<ul class="sidebar-nav">
+		 
+		
+	</ul>
+</div>
+
+        <section class="social">
+	
+	<a href="https://twitter.com/DylanMeeus" rel="me"><i class="fab fa-twitter fa-lg" aria-hidden="true"></i></a>
+	
+	
+	
+	<a href="https://github.com/DylanMeeus" rel="me"><i class="fab fa-github fa-lg" aria-hidden="true"></i></a>
+	
+	
+	
+	
+	
+	
+	
+	<a href="https://linkedin.com/in/dylanmeeus" rel="me"><i class="fab fa-linkedin fa-lg" aria-hidden="true"></i></a>
+	
+	
+	
+	
+	
+	
+	
+	
+	
+</section>
+
+      </div>
+    </div>
+    
+
+
+  </div>
+</div>
+
+        <div class="content container">
+            
+    
+<article>
+  <header>
+    <h1>Audio From Scratch With Go: Waveform synthesis</h1>
+    
+    
+<div class="post__meta">
+    
+    
+      <i class="fas fa-calendar-alt"></i> Aug 19, 2020
+    
+    
+    
+      
+      
+          in
+          
+          
+              <a class="badge badge-category" href="/categories/posts">POSTS</a>
+              
+          
+      
+    
+    
+    
+      
+      
+          <br/>
+           <i class="fas fa-tags"></i>
+          
+          <a class="badge badge-tag" href="/tags/audio">audio</a>
+           
+      
+          <a class="badge badge-tag" href="/tags/go">go</a>
+           
+      
+          <a class="badge badge-tag" href="/tags/goaudio">goaudio</a>
+          
+      
+    
+    
+    <br/>
+    <i class="fas fa-clock"></i> 9 min read
+</div>
+
+
+  </header>
+  
+  
+  <div class="post">
+    <p>In the <a href="https://dylanmeeus.github.io/tags/goaudio/">previous posts</a> we first looked at how we can
+generate a sine wave as raw floats and interpret with ffplay. Later we explored how to read / write
+.wave files and how to extract and create &lsquo;automation tracks&rsquo; using breakpoints.</p>
+<p>As you might have noticed, we&rsquo;ve never actually created .wave files from scratch with our own sound
+data. And, that&rsquo;s about to change now. In this blogpost we&rsquo;ll look at how we can create a variety of
+basic soundwaves.</p>
+<p>The code we&rsquo;ll be diving into for this post can be found in the <a href="https://github.com/DylanMeeus/GoAudio/blob/master/examples/oscillator/main.go">Github
+Examples</a> and as part
+of the <a href="https://github.com/DylanMeeus/GoAudio/blob/master/synthesizer/oscil.go">GoAudio</a> library.</p>
+<h1 id="constructing-an-oscillator">Constructing an oscillator</h1>
+<p>An oscillator is a device (in our case software) that generates a periodic (oscillating) signal. The
+sine wave is one example of such a waveform, but we&rsquo;ll also look at square waves, triangle waves,
+and sawtooth waves.</p>
+<p>At the end of this post, you&rsquo;ll be able to generate signals that look like this:</p>
+<p><img src="/audio/part8/waves.png" alt=""></p>
+<p>On the images, these look like connected lines, but in our digital audio signal that we will
+generate, we actually have a bunch of separate dots. How many &lsquo;dots&rsquo; do have in each cycle? That
+depends on the sample rate we are using.</p>
+<p>We can figure out how to place our dots given the <code>sample rate</code>. Remember that we are using radians
+in our trig functions, and a period of the wave is thus defined as: <code>2 * PI</code>. To know how to place
+our dots, we can figure out part of the puzzle (the &lsquo;increment&rsquo;) as follows:</p>
+<pre><code>increment = (2 * PI) / SampleRate
+</code></pre><p>Unfortunately, this is not the entire picture. We also have the issue that our wave has a certain
+frequency - which we&rsquo;ll have to account for in our increments. The actual function then becomes:</p>
+<pre><code>increment = ((2 * PI) / SampleRate) * freq
+</code></pre><p>In our <code>Oscillator</code> we&rsquo;ll have to track these things. We&rsquo;ll want to know what the current frequency
+is that we are generating a wave form, what the current phase in, and how to increment this phase to
+get the next value along our wave.</p>
+<p>But this solves only part of the puzzle. It&rsquo;s also clear now that we&rsquo;ll need a way to differentiate which type of waveform the user wants to
+generate. For this, we can start with an &ldquo;enum&rdquo; of a <code>Shape</code> type. Each shape will also need to be
+calculated in a different way, we can associate a <code>Shape</code> with a calculation function with
+<code>shapeCalcFunc = map[Shape]func(float64)float64</code></p>
+<div class="highlight"><div style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4">
+<table style="border-spacing:0;padding:0;margin:0;border:0;width:auto;overflow:auto;display:block;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 2
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 3
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 4
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 5
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 6
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 7
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 8
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 9
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">10
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">11
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">12
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">13
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">14
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">15
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">16
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">17
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">18
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">19
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#66d9ef">type</span> <span style="color:#a6e22e">Shape</span> <span style="color:#66d9ef">int</span>
+
+<span style="color:#66d9ef">const</span> (
+	<span style="color:#a6e22e">SINE</span> <span style="color:#a6e22e">Shape</span> = <span style="color:#66d9ef">iota</span>
+	<span style="color:#a6e22e">SQUARE</span>
+	<span style="color:#a6e22e">DOWNWARD_SAWTOOTH</span>
+	<span style="color:#a6e22e">UPWARD_SAWTOOTH</span>
+	<span style="color:#a6e22e">TRIANGLE</span>
+)
+
+<span style="color:#66d9ef">var</span> (
+	<span style="color:#a6e22e">shapeCalcFunc</span> = <span style="color:#66d9ef">map</span>[<span style="color:#a6e22e">Shape</span>]<span style="color:#66d9ef">func</span>(<span style="color:#66d9ef">float64</span>) <span style="color:#66d9ef">float64</span>{
+		<span style="color:#a6e22e">SINE</span>:              <span style="color:#a6e22e">sineCalc</span>,
+		<span style="color:#a6e22e">SQUARE</span>:            <span style="color:#a6e22e">squareCalc</span>,
+		<span style="color:#a6e22e">TRIANGLE</span>:          <span style="color:#a6e22e">triangleCalc</span>,
+		<span style="color:#a6e22e">DOWNWARD_SAWTOOTH</span>: <span style="color:#a6e22e">downSawtoothCalc</span>,
+		<span style="color:#a6e22e">UPWARD_SAWTOOTH</span>:   <span style="color:#a6e22e">upwSawtoothCalc</span>,
+	}
+)
+</code></pre></td></tr></table>
+</div>
+</div><p>These are our &lsquo;elementary&rsquo; shapes that we&rsquo;ll use for the next few posts. Although we&rsquo;ll extend on
+them, they&rsquo;ll give us a solid base to start.</p>
+<p>Putting these together, we can define an <code>Oscillator</code> struct:</p>
+<div class="highlight"><div style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4">
+<table style="border-spacing:0;padding:0;margin:0;border:0;width:auto;overflow:auto;display:block;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 2
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 3
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 4
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 5
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 6
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 7
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 8
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 9
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">10
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">11
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">12
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">13
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">14
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">15
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">16
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">17
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">18
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">19
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">20
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go">
+<span style="color:#66d9ef">type</span> <span style="color:#a6e22e">Oscillator</span> <span style="color:#66d9ef">struct</span> {
+	<span style="color:#a6e22e">curfreq</span>  <span style="color:#66d9ef">float64</span>
+	<span style="color:#a6e22e">curphase</span> <span style="color:#66d9ef">float64</span>
+	<span style="color:#a6e22e">incr</span>     <span style="color:#66d9ef">float64</span>
+	<span style="color:#a6e22e">twopiosr</span> <span style="color:#66d9ef">float64</span> <span style="color:#75715e">// (2*PI) / samplerate
+</span><span style="color:#75715e"></span>	<span style="color:#a6e22e">tickfunc</span> <span style="color:#66d9ef">func</span>(<span style="color:#66d9ef">float64</span>) <span style="color:#66d9ef">float64</span>
+}
+
+<span style="color:#75715e">// NewOscillator set to a given sample rate
+</span><span style="color:#75715e"></span><span style="color:#66d9ef">func</span> <span style="color:#a6e22e">NewOscillator</span>(<span style="color:#a6e22e">sr</span> <span style="color:#66d9ef">int</span>, <span style="color:#a6e22e">shape</span> <span style="color:#a6e22e">Shape</span>) (<span style="color:#f92672">*</span><span style="color:#a6e22e">Oscillator</span>, <span style="color:#66d9ef">error</span>) {
+	<span style="color:#a6e22e">cf</span>, <span style="color:#a6e22e">ok</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">shapeCalcFunc</span>[<span style="color:#a6e22e">shape</span>]
+	<span style="color:#66d9ef">if</span> !<span style="color:#a6e22e">ok</span> {
+		<span style="color:#66d9ef">return</span> <span style="color:#66d9ef">nil</span>, <span style="color:#a6e22e">fmt</span>.<span style="color:#a6e22e">Errorf</span>(<span style="color:#e6db74">&#34;Shape type %v not supported&#34;</span>, <span style="color:#a6e22e">shape</span>)
+	}
+	<span style="color:#66d9ef">return</span> <span style="color:#f92672">&amp;</span><span style="color:#a6e22e">Oscillator</span>{
+		<span style="color:#a6e22e">twopiosr</span>: <span style="color:#a6e22e">tau</span> <span style="color:#f92672">/</span> float64(<span style="color:#a6e22e">sr</span>),
+		<span style="color:#a6e22e">tickfunc</span>: <span style="color:#a6e22e">cf</span>,
+	}, <span style="color:#66d9ef">nil</span>
+}
+</code></pre></td></tr></table>
+</div>
+</div><p>Notice that we are storing <code>twopiosr = tau / SampleRate = (2 * PI) / SampleRate</code> as a convenience variable. We&rsquo;ll be
+using this in a few functions.</p>
+<h1 id="generating-waveforms">Generating waveforms</h1>
+<p>With this constructor, we have the basis for a working oscillator but it&rsquo;s not yet generating
+anything. For this purpose we&rsquo;ll need a function that asks the oscillator to generate the next value
+of the wave that it&rsquo;s producing. (It can do this indefinitely). This function will need to do a few
+things:</p>
+<ul>
+<li>Accept a frequency for the wave to generate</li>
+<li>Adjust the increment between frames</li>
+<li>Find the value at this phase</li>
+<li>Adjust the current phase</li>
+<li>Do some bounds checks on the phase (optionally)</li>
+</ul>
+<p>Our function in Go becomes:</p>
+<div class="highlight"><div style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4">
+<table style="border-spacing:0;padding:0;margin:0;border:0;width:auto;overflow:auto;display:block;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 2
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 3
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 4
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 5
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 6
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 7
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 8
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 9
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">10
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">11
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">12
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">13
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">14
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">15
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">16
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">17
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">18
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#66d9ef">func</span> (<span style="color:#a6e22e">o</span> <span style="color:#f92672">*</span><span style="color:#a6e22e">Oscillator</span>) <span style="color:#a6e22e">Tick</span>(<span style="color:#a6e22e">freq</span> <span style="color:#66d9ef">float64</span>) <span style="color:#66d9ef">float64</span> {
+	<span style="color:#66d9ef">if</span> <span style="color:#a6e22e">o</span>.<span style="color:#a6e22e">curfreq</span> <span style="color:#f92672">!=</span> <span style="color:#a6e22e">freq</span> {
+		<span style="color:#a6e22e">o</span>.<span style="color:#a6e22e">curfreq</span> = <span style="color:#a6e22e">freq</span>
+		<span style="color:#a6e22e">o</span>.<span style="color:#a6e22e">incr</span> = <span style="color:#a6e22e">o</span>.<span style="color:#a6e22e">twopiosr</span> <span style="color:#f92672">*</span> <span style="color:#a6e22e">freq</span>
+	}
+	<span style="color:#a6e22e">val</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">o</span>.<span style="color:#a6e22e">tickfunc</span>(<span style="color:#a6e22e">o</span>.<span style="color:#a6e22e">curphase</span>)
+	<span style="color:#a6e22e">o</span>.<span style="color:#a6e22e">curphase</span> <span style="color:#f92672">+=</span> <span style="color:#a6e22e">o</span>.<span style="color:#a6e22e">incr</span>
+        
+        <span style="color:#75715e">// adjust bounds
+</span><span style="color:#75715e"></span>	<span style="color:#66d9ef">if</span> <span style="color:#a6e22e">o</span>.<span style="color:#a6e22e">curphase</span> <span style="color:#f92672">&gt;=</span> <span style="color:#a6e22e">tau</span> {
+		<span style="color:#a6e22e">o</span>.<span style="color:#a6e22e">curphase</span> <span style="color:#f92672">-=</span> <span style="color:#a6e22e">tau</span>
+	}
+	<span style="color:#66d9ef">if</span> <span style="color:#a6e22e">o</span>.<span style="color:#a6e22e">curphase</span> &lt; <span style="color:#ae81ff">0</span> {
+		<span style="color:#a6e22e">o</span>.<span style="color:#a6e22e">curphase</span> = <span style="color:#a6e22e">tau</span>
+	}
+	<span style="color:#66d9ef">return</span> <span style="color:#a6e22e">val</span>
+
+}
+</code></pre></td></tr></table>
+</div>
+</div><p>The adjustments to our curphase is to keep it in the bounds (Although depending on the
+implementation of the <code>sin</code> function this might not be necessary, I kept it here as a guard but I&rsquo;m
+pretty sure it&rsquo;s not necessary in Go).</p>
+<h1 id="waveforms-functions">Waveforms functions</h1>
+<p>The only part left to implement is the actual generation of the different shapes of waves. This is
+what happens in the call <code>val := o.tickfunc(o.curphase)</code>. By using a generic function call, we can
+inject the correct calculation function in the call to <code>NewOscillator()</code>.</p>
+<p>The easiest one to implement is the Sine wave.</p>
+<div class="highlight"><div style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4">
+<table style="border-spacing:0;padding:0;margin:0;border:0;width:auto;overflow:auto;display:block;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#66d9ef">func</span> <span style="color:#a6e22e">sineCalc</span>(<span style="color:#a6e22e">phase</span> <span style="color:#66d9ef">float64</span>) <span style="color:#66d9ef">float64</span> {
+	<span style="color:#66d9ef">return</span> <span style="color:#a6e22e">math</span>.<span style="color:#a6e22e">Sin</span>(<span style="color:#a6e22e">phase</span>)
+}
+</code></pre></td></tr></table>
+</div>
+</div><p>A close contender for being the most simple to implement is probably the square wave function. In
+this case, half our period is <code>1</code> and the other half is <code>-1</code>. This probably looks familiar to you if you&rsquo;ve
+seen binary signals represented as waves before.</p>
+<div class="highlight"><div style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4">
+<table style="border-spacing:0;padding:0;margin:0;border:0;width:auto;overflow:auto;display:block;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">4
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">5
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">6
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">7
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#66d9ef">func</span> <span style="color:#a6e22e">squareCalc</span>(<span style="color:#a6e22e">phase</span> <span style="color:#66d9ef">float64</span>) <span style="color:#66d9ef">float64</span> {
+	<span style="color:#a6e22e">val</span> <span style="color:#f92672">:=</span> <span style="color:#f92672">-</span><span style="color:#ae81ff">1.0</span>
+	<span style="color:#66d9ef">if</span> <span style="color:#a6e22e">phase</span> <span style="color:#f92672">&lt;=</span> <span style="color:#a6e22e">math</span>.<span style="color:#a6e22e">Pi</span> {
+		<span style="color:#a6e22e">val</span> = <span style="color:#ae81ff">1.0</span>
+	}
+	<span style="color:#66d9ef">return</span> <span style="color:#a6e22e">val</span>
+}
+</code></pre></td></tr></table>
+</div>
+</div><p>The triangle wave is the first one that looks more complex, with the sawtooth waves being related
+to it (you can visually see a sawtooth is being part of the triangle with a sharp cut-off.</p>
+<div class="highlight"><div style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4">
+<table style="border-spacing:0;padding:0;margin:0;border:0;width:auto;overflow:auto;display:block;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 2
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 3
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 4
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 5
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 6
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 7
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 8
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 9
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">10
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">11
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">12
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">13
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">14
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">15
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">16
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">17
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">18
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#66d9ef">func</span> <span style="color:#a6e22e">triangleCalc</span>(<span style="color:#a6e22e">phase</span> <span style="color:#66d9ef">float64</span>) <span style="color:#66d9ef">float64</span> {
+	<span style="color:#a6e22e">val</span> <span style="color:#f92672">:=</span> <span style="color:#ae81ff">2.0</span><span style="color:#f92672">*</span>(<span style="color:#a6e22e">phase</span><span style="color:#f92672">*</span>(<span style="color:#ae81ff">1.0</span><span style="color:#f92672">/</span><span style="color:#a6e22e">tau</span>)) <span style="color:#f92672">-</span> <span style="color:#ae81ff">1.0</span>
+	<span style="color:#66d9ef">if</span> <span style="color:#a6e22e">val</span> &lt; <span style="color:#ae81ff">0.0</span> {
+		<span style="color:#a6e22e">val</span> = <span style="color:#f92672">-</span><span style="color:#a6e22e">val</span>
+	}
+	<span style="color:#a6e22e">val</span> = <span style="color:#ae81ff">2.0</span> <span style="color:#f92672">*</span> (<span style="color:#a6e22e">val</span> <span style="color:#f92672">-</span> <span style="color:#ae81ff">0.5</span>)
+	<span style="color:#66d9ef">return</span> <span style="color:#a6e22e">val</span>
+}
+
+<span style="color:#66d9ef">func</span> <span style="color:#a6e22e">upwSawtoothCalc</span>(<span style="color:#a6e22e">phase</span> <span style="color:#66d9ef">float64</span>) <span style="color:#66d9ef">float64</span> {
+	<span style="color:#a6e22e">val</span> <span style="color:#f92672">:=</span> <span style="color:#ae81ff">2.0</span><span style="color:#f92672">*</span>(<span style="color:#a6e22e">phase</span><span style="color:#f92672">*</span>(<span style="color:#ae81ff">1.0</span><span style="color:#f92672">/</span><span style="color:#a6e22e">tau</span>)) <span style="color:#f92672">-</span> <span style="color:#ae81ff">1.0</span>
+	<span style="color:#66d9ef">return</span> <span style="color:#a6e22e">val</span>
+}
+
+<span style="color:#66d9ef">func</span> <span style="color:#a6e22e">downSawtoothCalc</span>(<span style="color:#a6e22e">phase</span> <span style="color:#66d9ef">float64</span>) <span style="color:#66d9ef">float64</span> {
+	<span style="color:#a6e22e">val</span> <span style="color:#f92672">:=</span> <span style="color:#ae81ff">1.0</span> <span style="color:#f92672">-</span> <span style="color:#ae81ff">2.0</span><span style="color:#f92672">*</span>(<span style="color:#a6e22e">phase</span><span style="color:#f92672">*</span>(<span style="color:#ae81ff">1.0</span><span style="color:#f92672">/</span><span style="color:#a6e22e">tau</span>))
+	<span style="color:#66d9ef">return</span> <span style="color:#a6e22e">val</span>
+}
+</code></pre></td></tr></table>
+</div>
+</div><h1 id="making-waves">Making waves</h1>
+<p>With our oscillator set up, we can finally start using it. All the code that follows is contained in
+this <a href="https://github.com/DylanMeeus/GoAudio/blob/master/examples/oscillator/main.go">GoAudio
+example</a>. The setup
+of this example is similar to what we&rsquo;ve seen in the previous posts where we deal with parsing
+breakpoints. To keep things simple, this entire setup happens in our main routine.</p>
+<div class="highlight"><div style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4">
+<table style="border-spacing:0;padding:0;margin:0;border:0;width:auto;overflow:auto;display:block;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 2
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 3
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 4
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 5
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 6
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 7
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 8
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 9
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">10
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">11
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">12
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">13
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">14
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">15
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">16
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">17
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">18
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">19
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">20
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">21
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">22
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">23
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">24
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">25
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">26
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">27
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">28
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">29
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">30
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">31
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">32
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">33
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">34
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">35
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">36
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#66d9ef">func</span> <span style="color:#a6e22e">main</span>() {
+	<span style="color:#a6e22e">flag</span>.<span style="color:#a6e22e">Parse</span>()
+	<span style="color:#a6e22e">fmt</span>.<span style="color:#a6e22e">Println</span>(<span style="color:#e6db74">&#34;usage: go run main -d {dur} -s {shape} -a {amps} -f {freqs} -o {output}&#34;</span>)
+	<span style="color:#66d9ef">if</span> <span style="color:#a6e22e">output</span> <span style="color:#f92672">==</span> <span style="color:#66d9ef">nil</span> {
+		panic(<span style="color:#e6db74">&#34;please provide an output file&#34;</span>)
+	}
+
+	<span style="color:#a6e22e">wfmt</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">wave</span>.<span style="color:#a6e22e">NewWaveFmt</span>(<span style="color:#ae81ff">1</span>, <span style="color:#ae81ff">1</span>, <span style="color:#ae81ff">44100</span>, <span style="color:#ae81ff">16</span>, <span style="color:#66d9ef">nil</span>)
+	<span style="color:#a6e22e">amps</span>, <span style="color:#a6e22e">err</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">ioutil</span>.<span style="color:#a6e22e">ReadFile</span>(<span style="color:#f92672">*</span><span style="color:#a6e22e">amppoints</span>)
+	<span style="color:#66d9ef">if</span> <span style="color:#a6e22e">err</span> <span style="color:#f92672">!=</span> <span style="color:#66d9ef">nil</span> {
+		panic(<span style="color:#a6e22e">err</span>)
+	}
+	<span style="color:#a6e22e">ampPoints</span>, <span style="color:#a6e22e">err</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">breakpoint</span>.<span style="color:#a6e22e">ParseBreakpoints</span>(<span style="color:#a6e22e">bytes</span>.<span style="color:#a6e22e">NewReader</span>(<span style="color:#a6e22e">amps</span>))
+	<span style="color:#66d9ef">if</span> <span style="color:#a6e22e">err</span> <span style="color:#f92672">!=</span> <span style="color:#66d9ef">nil</span> {
+		panic(<span style="color:#a6e22e">err</span>)
+	}
+	<span style="color:#a6e22e">ampStream</span>, <span style="color:#a6e22e">err</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">breakpoint</span>.<span style="color:#a6e22e">NewBreakpointStream</span>(<span style="color:#a6e22e">ampPoints</span>, <span style="color:#a6e22e">wfmt</span>.<span style="color:#a6e22e">SampleRate</span>)
+
+	<span style="color:#a6e22e">freqs</span>, <span style="color:#a6e22e">err</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">ioutil</span>.<span style="color:#a6e22e">ReadFile</span>(<span style="color:#f92672">*</span><span style="color:#a6e22e">freqpoints</span>)
+	<span style="color:#66d9ef">if</span> <span style="color:#a6e22e">err</span> <span style="color:#f92672">!=</span> <span style="color:#66d9ef">nil</span> {
+		panic(<span style="color:#a6e22e">err</span>)
+	}
+	<span style="color:#a6e22e">freqPoints</span>, <span style="color:#a6e22e">err</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">breakpoint</span>.<span style="color:#a6e22e">ParseBreakpoints</span>(<span style="color:#a6e22e">bytes</span>.<span style="color:#a6e22e">NewReader</span>(<span style="color:#a6e22e">freqs</span>))
+	<span style="color:#66d9ef">if</span> <span style="color:#a6e22e">err</span> <span style="color:#f92672">!=</span> <span style="color:#66d9ef">nil</span> {
+		panic(<span style="color:#a6e22e">err</span>)
+	}
+	<span style="color:#a6e22e">freqStream</span>, <span style="color:#a6e22e">err</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">breakpoint</span>.<span style="color:#a6e22e">NewBreakpointStream</span>(<span style="color:#a6e22e">freqPoints</span>, <span style="color:#a6e22e">wfmt</span>.<span style="color:#a6e22e">SampleRate</span>)
+	<span style="color:#66d9ef">if</span> <span style="color:#a6e22e">err</span> <span style="color:#f92672">!=</span> <span style="color:#66d9ef">nil</span> {
+		panic(<span style="color:#a6e22e">err</span>)
+	}
+	<span style="color:#75715e">// create wave file sampled at 44.1Khz w/ 16-bit frames
+</span><span style="color:#75715e"></span>
+	<span style="color:#a6e22e">frames</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">generate</span>(<span style="color:#f92672">*</span><span style="color:#a6e22e">duration</span>, <span style="color:#a6e22e">stringToShape</span>[<span style="color:#f92672">*</span><span style="color:#a6e22e">shape</span>], <span style="color:#a6e22e">ampStream</span>, <span style="color:#a6e22e">freqStream</span>, <span style="color:#a6e22e">wfmt</span>)
+	<span style="color:#a6e22e">wave</span>.<span style="color:#a6e22e">WriteFrames</span>(<span style="color:#a6e22e">frames</span>, <span style="color:#a6e22e">wfmt</span>, <span style="color:#f92672">*</span><span style="color:#a6e22e">output</span>)
+	<span style="color:#a6e22e">fmt</span>.<span style="color:#a6e22e">Println</span>(<span style="color:#e6db74">&#34;done&#34;</span>)
+}
+</code></pre></td></tr></table>
+</div>
+</div><p>Notice that we also print the usage, we expect a duration, a shape, amplitude breakpoints, frequency
+breakpoints and finally an output file. The &lsquo;heavy lifting&rsquo; happens in the call to the <code>generate</code>
+function. Here we pass along the duration, a <code>Shape</code> instance derived from the string entered on the
+CLI, our breakpoints and finally also a WaveFmt. Remember that the WaveFmt struct contains the
+metadata for the <code>.wave</code> files we are generating. In this case, the statement <code>wave.NewWaveFmt(1, 1, 44100, 16, nil)</code> means it&rsquo;s a standard PCM wave-file, with 1 channel (mono) playing at 44.1Khz,
+where the data consists of 16-bit floats. You can play with these values to see how the result
+changes. (Well, the channels are a bit trickier to change as we learned in <a href="https://dylanmeeus.github.io/posts/audio-from-scratch-pt4/">this
+post</a>).</p>
+<p>Finally in the generate function, we need to calculate the amount of samples (= frames for mono) we
+need to generate. Then we&rsquo;ll call the <code>Tick</code> function of our oscillator as well of our breakpoint
+stream to continously retrieve the next value.</p>
+<div class="highlight"><div style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4">
+<table style="border-spacing:0;padding:0;margin:0;border:0;width:auto;overflow:auto;display:block;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 2
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 3
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 4
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 5
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 6
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 7
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 8
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 9
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">10
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">11
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">12
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">13
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">14
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">15
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">16
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#66d9ef">func</span> <span style="color:#a6e22e">generate</span>(<span style="color:#a6e22e">dur</span> <span style="color:#66d9ef">int</span>, <span style="color:#a6e22e">shape</span> <span style="color:#a6e22e">synth</span>.<span style="color:#a6e22e">Shape</span>, <span style="color:#a6e22e">ampStream</span>, <span style="color:#a6e22e">freqStream</span> <span style="color:#f92672">*</span><span style="color:#a6e22e">breakpoint</span>.<span style="color:#a6e22e">BreakpointStream</span>, <span style="color:#a6e22e">wfmt</span> <span style="color:#a6e22e">wave</span>.<span style="color:#a6e22e">WaveFmt</span>) []<span style="color:#a6e22e">wave</span>.<span style="color:#a6e22e">Frame</span> {
+	<span style="color:#a6e22e">reqFrames</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">dur</span> <span style="color:#f92672">*</span> <span style="color:#a6e22e">wfmt</span>.<span style="color:#a6e22e">SampleRate</span>
+	<span style="color:#a6e22e">frames</span> <span style="color:#f92672">:=</span> make([]<span style="color:#a6e22e">wave</span>.<span style="color:#a6e22e">Frame</span>, <span style="color:#a6e22e">reqFrames</span>)
+	<span style="color:#a6e22e">osc</span>, <span style="color:#a6e22e">err</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">synth</span>.<span style="color:#a6e22e">NewOscillator</span>(<span style="color:#a6e22e">wfmt</span>.<span style="color:#a6e22e">SampleRate</span>, <span style="color:#a6e22e">shape</span>)
+	<span style="color:#66d9ef">if</span> <span style="color:#a6e22e">err</span> <span style="color:#f92672">!=</span> <span style="color:#66d9ef">nil</span> {
+		panic(<span style="color:#a6e22e">err</span>)
+	}
+
+	<span style="color:#66d9ef">for</span> <span style="color:#a6e22e">i</span> <span style="color:#f92672">:=</span> <span style="color:#66d9ef">range</span> <span style="color:#a6e22e">frames</span> {
+		<span style="color:#a6e22e">amp</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">ampStream</span>.<span style="color:#a6e22e">Tick</span>()
+		<span style="color:#a6e22e">freq</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">freqStream</span>.<span style="color:#a6e22e">Tick</span>()
+		<span style="color:#a6e22e">frames</span>[<span style="color:#a6e22e">i</span>] = <span style="color:#a6e22e">wave</span>.<span style="color:#a6e22e">Frame</span>(<span style="color:#a6e22e">amp</span> <span style="color:#f92672">*</span> <span style="color:#a6e22e">osc</span>.<span style="color:#a6e22e">Tick</span>(<span style="color:#a6e22e">freq</span>))
+	}
+
+	<span style="color:#66d9ef">return</span> <span style="color:#a6e22e">frames</span>
+}
+</code></pre></td></tr></table>
+</div>
+</div><p>And there we go, we now have all code in place for generating basic waveforms. When examining them
+in audacity we get the result shown at the beginning of this post.</p>
+<h1 id="improvements">Improvements</h1>
+<p>With this we can generate basic &ldquo;clean&rdquo; audio signals, this could be handy for testing purposes but
+as far as I know it pretty much ends there. (Most software synths will also let you play around with
+these type of waves, but you&rsquo;ll tweak them to something more usable).</p>
+<p>You might have some concerns with this code though, the first being the performance issue. An
+oscillator is by definition something repetitive, yet we are constantly calculating the &lsquo;next
+phase&rsquo;. Is this strictly necessary? No, we can actually store the values we expect to see in a
+&lsquo;lookup  table&rsquo;. (As a complete side-note here, this always reminds me of how in WW2 they used
+&lsquo;firing tables&rsquo; to lookup ballistic trajectories. More on that
+<a href="http://www.cs.kent.edu/~rothstei/10051/HistoryPt3.htm">here</a>)</p>
+<p>In the next post we&rsquo;ll take a look at using lookup tables, and we&rsquo;ll also start thinking about
+harmonics to represent sound in a more realistic way.</p>
+<h1 id="resources">Resources</h1>
+<ul>
+<li><a href="https://github.com/DylanMeeus/GoAudio">GoAudio</a></li>
+<li><a href="https://github.com/DylanMeeus/GoAudio/blob/master/examples/oscillator/main.go">Oscillator examples</a></li>
+</ul>
+<hr>
+<p>If you liked this and want to know when I write new posts, the best way to keep up to date is by <a href="https://twitter.com/DylanMeeus">following me on
+twitter</a>.</p>
+
+  </div>
+  
+
+<div class="navigation navigation-single">
+    
+    <a href="/posts/audio-from-scratch-pt7/" class="navigation-prev">
+      <i aria-hidden="true" class="fa fa-chevron-left"></i>
+      <span class="navigation-tittle">Audio From Scratch With Go: Extracting Breakpoints</span>
+    </a>
+    
+    
+</div>
+
+
+  
+
+  
+    
+
+
+</article>
+
+
+        </div>
+        
+    
+
+  
+  
+<script type="application/javascript">
+var doNotTrack = false;
+if (!doNotTrack) {
+	window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+	ga('create', 'UA-172416417-1', 'auto');
+	
+	ga('send', 'pageview');
+}
+</script>
+<script async src='https://www.google-analytics.com/analytics.js'></script>
+
+
+<script defer src="https://use.fontawesome.com/releases/v5.11.2/js/all.js" integrity="sha384-b3ua1l97aVGAPEIe48b4TC60WUQbQaGi2jqAWM90y0OZXZeyaTCWtBTKtjW2GXG1" crossorigin="anonymous"></script>
+
+
+
+
+    
+
+
+
+    </body>
+</html>
