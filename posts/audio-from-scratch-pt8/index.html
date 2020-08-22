@@ -24,13 +24,13 @@
 <meta name="twitter:image" content="https://dylanmeeus.github.io/audio/part8/waves.png"/>
 
 <meta name="twitter:title" content="Audio From Scratch With Go: Waveform synthesis"/>
-<meta name="twitter:description" content="In the previous posts we first looked at how we can generate a sine wave as raw floats and interpret with ffplay. Later we explored how to read / write .wave files and how to extract and create &lsquo;automation tracks&rsquo; using breakpoints.
-As you might have noticed, we&rsquo;ve never actually created .wave files from scratch with our own sound data. And, that&rsquo;s about to change now. In this blogpost we&rsquo;ll look at how we can create a variety of basic soundwaves."/>
+<meta name="twitter:description" content="In the previous posts we first looked at how we can generate a sine wave as &lsquo;raw&rsquo; floats and interpret them using ffplay. Later we explored how to read / write .wave files and how to extract and create &lsquo;automation tracks&rsquo; using breakpoints.
+As you might have noticed, we&rsquo;ve never actually created .wave files from scratch with our own sound data. So, it&rsquo;s about time to change that. In this blogpost we&rsquo;ll look at how we can create a variety of basic soundwaves."/>
 <meta name="twitter:site" content="@DylanMeeus"/>
 
 <meta property="og:title" content="Audio From Scratch With Go: Waveform synthesis" />
-<meta property="og:description" content="In the previous posts we first looked at how we can generate a sine wave as raw floats and interpret with ffplay. Later we explored how to read / write .wave files and how to extract and create &lsquo;automation tracks&rsquo; using breakpoints.
-As you might have noticed, we&rsquo;ve never actually created .wave files from scratch with our own sound data. And, that&rsquo;s about to change now. In this blogpost we&rsquo;ll look at how we can create a variety of basic soundwaves." />
+<meta property="og:description" content="In the previous posts we first looked at how we can generate a sine wave as &lsquo;raw&rsquo; floats and interpret them using ffplay. Later we explored how to read / write .wave files and how to extract and create &lsquo;automation tracks&rsquo; using breakpoints.
+As you might have noticed, we&rsquo;ve never actually created .wave files from scratch with our own sound data. So, it&rsquo;s about time to change that. In this blogpost we&rsquo;ll look at how we can create a variety of basic soundwaves." />
 <meta property="og:type" content="article" />
 <meta property="og:url" content="https://dylanmeeus.github.io/posts/audio-from-scratch-pt8/" />
 <meta property="og:image" content="https://dylanmeeus.github.io/audio/part8/waves.png" />
@@ -210,37 +210,35 @@ if (!doNotTrack) {
   
   <div class="post">
     <p>In the <a href="https://dylanmeeus.github.io/tags/goaudio/">previous posts</a> we first looked at how we can
-generate a sine wave as raw floats and interpret with ffplay. Later we explored how to read / write
+generate a sine wave as &lsquo;raw&rsquo; floats and interpret them using ffplay. Later we explored how to read / write
 .wave files and how to extract and create &lsquo;automation tracks&rsquo; using breakpoints.</p>
 <p>As you might have noticed, we&rsquo;ve never actually created .wave files from scratch with our own sound
-data. And, that&rsquo;s about to change now. In this blogpost we&rsquo;ll look at how we can create a variety of
+data. So, it&rsquo;s about time to change that. In this blogpost we&rsquo;ll look at how we can create a variety of
 basic soundwaves.</p>
 <p>The code we&rsquo;ll be diving into for this post can be found in the <a href="https://github.com/DylanMeeus/GoAudio/blob/master/examples/oscillator/main.go">Github
 Examples</a> and as part
 of the <a href="https://github.com/DylanMeeus/GoAudio/blob/master/synthesizer/oscil.go">GoAudio</a> library.</p>
 <h1 id="constructing-an-oscillator">Constructing an oscillator</h1>
-<p>An oscillator is a device (in our case software) that generates a periodic (oscillating) signal. The
+<p>An oscillator is a device (in our case a piece of code) that generates a periodic (oscillating) signal. The
 sine wave is one example of such a waveform, but we&rsquo;ll also look at square waves, triangle waves,
 and sawtooth waves.</p>
 <p>At the end of this post, you&rsquo;ll be able to generate signals that look like this:</p>
 <p><img src="/audio/part8/waves.png" alt=""></p>
 <p>On the images, these look like connected lines, but in our digital audio signal that we will
-generate, we actually have a bunch of separate dots. How many &lsquo;dots&rsquo; do have in each cycle? That
+generate, they are separate datapoints. How many &lsquo;points&rsquo; do have in each cycle? That
 depends on the sample rate we are using.</p>
 <p>We can figure out how to place our dots given the <code>sample rate</code>. Remember that we are using radians
 in our trig functions, and a period of the wave is thus defined as: <code>2 * PI</code>. To know how to place
-our dots, we can figure out part of the puzzle (the &lsquo;increment&rsquo;) as follows:</p>
+our points, we can figure out part of the puzzle (the &lsquo;increment&rsquo;) as follows:</p>
 <pre><code>increment = (2 * PI) / SampleRate
-</code></pre><p>Unfortunately, this is not the entire picture. We also have the issue that our wave has a certain
+</code></pre><p>Unfortunately, this is not the entire picture. We also have the keep in mind that our wave has a certain
 frequency - which we&rsquo;ll have to account for in our increments. The actual function then becomes:</p>
 <pre><code>increment = ((2 * PI) / SampleRate) * freq
 </code></pre><p>In our <code>Oscillator</code> we&rsquo;ll have to track these things. We&rsquo;ll want to know what the current frequency
-is that we are generating a wave form, what the current phase in, and how to increment this phase to
-get the next value along our wave.</p>
-<p>But this solves only part of the puzzle. It&rsquo;s also clear now that we&rsquo;ll need a way to differentiate which type of waveform the user wants to
+is, what the current phase is, and how to increment this phase to get the next value of our wave.</p>
+<p>This solves only part of the puzzle. It&rsquo;s also clear now that we&rsquo;ll need a way to differentiate which type of waveform the user wants to
 generate. For this, we can start with an &ldquo;enum&rdquo; of a <code>Shape</code> type. Each shape will also need to be
-calculated in a different way, we can associate a <code>Shape</code> with a calculation function with
-<code>shapeCalcFunc = map[Shape]func(float64)float64</code></p>
+calculated in a different way, so we can associate a <code>Shape</code> with a calculation function with a map <code>shapeCalcFunc = map[Shape]func(float64)float64</code></p>
 <div class="highlight"><div style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4">
 <table style="border-spacing:0;padding:0;margin:0;border:0;width:auto;overflow:auto;display:block;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
 <pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1
@@ -287,7 +285,7 @@ calculated in a different way, we can associate a <code>Shape</code> with a calc
 </div>
 </div><p>These are our &lsquo;elementary&rsquo; shapes that we&rsquo;ll use for the next few posts. Although we&rsquo;ll extend on
 them, they&rsquo;ll give us a solid base to start.</p>
-<p>Putting these together, we can define an <code>Oscillator</code> struct:</p>
+<p>Putting this together, we can define an <code>Oscillator</code> struct:</p>
 <div class="highlight"><div style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4">
 <table style="border-spacing:0;padding:0;margin:0;border:0;width:auto;overflow:auto;display:block;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
 <pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1
@@ -328,8 +326,8 @@ them, they&rsquo;ll give us a solid base to start.</p>
 		<span style="color:#66d9ef">return</span> <span style="color:#66d9ef">nil</span>, <span style="color:#a6e22e">fmt</span>.<span style="color:#a6e22e">Errorf</span>(<span style="color:#e6db74">&#34;Shape type %v not supported&#34;</span>, <span style="color:#a6e22e">shape</span>)
 	}
 	<span style="color:#66d9ef">return</span> <span style="color:#f92672">&amp;</span><span style="color:#a6e22e">Oscillator</span>{
-		<span style="color:#a6e22e">twopiosr</span>: <span style="color:#a6e22e">tau</span> <span style="color:#f92672">/</span> float64(<span style="color:#a6e22e">sr</span>),
-		<span style="color:#a6e22e">tickfunc</span>: <span style="color:#a6e22e">cf</span>,
+		<span style="color:#a6e22e">twopiosr</span>: <span style="color:#a6e22e">tau</span> <span style="color:#f92672">/</span> float64(<span style="color:#a6e22e">sr</span>), <span style="color:#75715e">// (2 * PI) / SampleRate
+</span><span style="color:#75715e"></span>		<span style="color:#a6e22e">tickfunc</span>: <span style="color:#a6e22e">cf</span>,
 	}, <span style="color:#66d9ef">nil</span>
 }
 </code></pre></td></tr></table>
@@ -338,8 +336,8 @@ them, they&rsquo;ll give us a solid base to start.</p>
 using this in a few functions.</p>
 <h1 id="generating-waveforms">Generating waveforms</h1>
 <p>With this constructor, we have the basis for a working oscillator but it&rsquo;s not yet generating
-anything. For this purpose we&rsquo;ll need a function that asks the oscillator to generate the next value
-of the wave that it&rsquo;s producing. (It can do this indefinitely). This function will need to do a few
+anything. For this purpose we&rsquo;ll need a function that asks the oscillator to produce the next value
+of the wave (It can do this indefinitely). This function will need to do a few
 things:</p>
 <ul>
 <li>Accept a frequency for the wave to generate</li>
@@ -412,8 +410,7 @@ inject the correct calculation function in the call to <code>NewOscillator()</co
 </code></pre></td></tr></table>
 </div>
 </div><p>A close contender for being the most simple to implement is probably the square wave function. In
-this case, half our period is <code>1</code> and the other half is <code>-1</code>. This probably looks familiar to you if you&rsquo;ve
-seen binary signals represented as waves before.</p>
+this case, half our period is <code>1</code> and the other half is <code>-1</code>.</p>
 <div class="highlight"><div style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4">
 <table style="border-spacing:0;padding:0;margin:0;border:0;width:auto;overflow:auto;display:block;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
 <pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
@@ -562,7 +559,7 @@ breakpoints. To keep things simple, this entire setup happens in our main routin
 }
 </code></pre></td></tr></table>
 </div>
-</div><p>Notice that we also print the usage, we expect a duration, a shape, amplitude breakpoints, frequency
+</div><p>Notice that we also print the usage, this tells us that we expect a duration, a shape, amplitude breakpoints, frequency
 breakpoints and finally an output file. The &lsquo;heavy lifting&rsquo; happens in the call to the <code>generate</code>
 function. Here we pass along the duration, a <code>Shape</code> instance derived from the string entered on the
 CLI, our breakpoints and finally also a WaveFmt. Remember that the WaveFmt struct contains the
