@@ -6,10 +6,20 @@
     <description>Recent content on Dylan Meeus</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Wed, 19 Aug 2020 20:45:50 +0200</lastBuildDate>
+    <lastBuildDate>Tue, 25 Aug 2020 19:57:06 +0200</lastBuildDate>
     
 	<atom:link href="https://dylanmeeus.github.io/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>Software Engineering at Google</title>
+      <link>https://dylanmeeus.github.io/posts/software-engineering-at-google/</link>
+      <pubDate>Tue, 25 Aug 2020 19:57:06 +0200</pubDate>
+      
+      <guid>https://dylanmeeus.github.io/posts/software-engineering-at-google/</guid>
+      <description>If there was one book this year that it was hard to avoid hearing about, it was &amp;ldquo;Software Engineering at Google&amp;rdquo;. As such, it was only a matter of time before I jumped on the bandwagon and decided to give it a read, but I&amp;rsquo;m happy I finally did!
+I track my highlights and notes through my kindle / goodreads, and ended up with about 80 of them. In this blogpost, I&amp;rsquo;ll just go over some of what that I thought stood out in the book in one way or another.</description>
+    </item>
     
     <item>
       <title>Audio From Scratch With Go: Waveform synthesis</title>

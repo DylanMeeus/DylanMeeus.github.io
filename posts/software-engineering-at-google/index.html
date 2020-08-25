@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="en-us">
+    
+    
+
+
+    <head>
+    <link href="https://gmpg.org/xfn/11" rel="profile">
+    <meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta http-equiv="Cache-Control" content="public" />
+<!-- Enable responsiveness on mobile devices -->
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+<meta name="generator" content="Hugo 0.73.0" />
+
+    
+    
+    
+
+<title>Software Engineering at Google • Dylan Meeus</title>
+
+
+<meta name="twitter:card" content="summary_large_image"/>
+<meta name="twitter:image" content="https://dylanmeeus.github.io/se-at-google/cover.jpg"/>
+
+<meta name="twitter:title" content="Software Engineering at Google"/>
+<meta name="twitter:description" content="If there was one book this year that it was hard to avoid hearing about, it was &ldquo;Software Engineering at Google&rdquo;. As such, it was only a matter of time before I jumped on the bandwagon and decided to give it a read, but I&rsquo;m happy I finally did!
+I track my highlights and notes through my kindle / goodreads, and ended up with about 80 of them. In this blogpost, I&rsquo;ll just go over some of what that I thought stood out in the book in one way or another."/>
+<meta name="twitter:site" content="@DylanMeeus"/>
+
+<meta property="og:title" content="Software Engineering at Google" />
+<meta property="og:description" content="If there was one book this year that it was hard to avoid hearing about, it was &ldquo;Software Engineering at Google&rdquo;. As such, it was only a matter of time before I jumped on the bandwagon and decided to give it a read, but I&rsquo;m happy I finally did!
+I track my highlights and notes through my kindle / goodreads, and ended up with about 80 of them. In this blogpost, I&rsquo;ll just go over some of what that I thought stood out in the book in one way or another." />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://dylanmeeus.github.io/posts/software-engineering-at-google/" />
+<meta property="og:image" content="https://dylanmeeus.github.io/se-at-google/cover.jpg" />
+<meta property="article:published_time" content="2020-08-25T19:57:06+02:00" />
+<meta property="article:modified_time" content="2020-08-25T19:57:06+02:00" />
+
+
+    
+
+
+
+
+
+
+<link rel="stylesheet" href="/scss/hyde-hyde.6a83d62c39a364f036df4db1ecd564645635d6c7fc182425cb501218fec485f5.css" integrity="sha256-aoPWLDmjZPA2302x7NVkZFY11sf8GCQly1ASGP7EhfU=">
+
+
+<link rel="stylesheet" href="/scss/print.2744dcbf8a0b2e74f8a50e4b34e5f441be7cf93cc7de27029121c6a09f9e77bc.css" integrity="sha256-J0Tcv4oLLnT4pQ5LNOX0Qb58&#43;TzH3icCkSHGoJ&#43;ed7w=" media="print">
+
+
+
+
+    
+<script type="application/javascript">
+var doNotTrack = false;
+if (!doNotTrack) {
+	(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+	(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+	m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+	})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+	ga('create', 'UA-172416417-1', 'auto');
+	
+	ga('send', 'pageview');
+}
+</script>
+
+    
+<script type="application/javascript">
+var doNotTrack = false;
+if (!doNotTrack) {
+	window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+	ga('create', 'UA-172416417-1', 'auto');
+	
+	ga('send', 'pageview');
+}
+</script>
+<script async src='https://www.google-analytics.com/analytics.js'></script>
+
+
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+    <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
+    <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+    <!-- Icons -->
+    <link rel="apple-touch-icon-precomposed" sizes="144x144" href="/apple-touch-icon-144-precomposed.png">
+    <link rel="shortcut icon" href="/favicon.png">
+    
+    
+
+</head>
+
+
+    <body class=" ">
+    
+<div class="sidebar">
+  <div class="container ">
+    <div class="sidebar-about">
+      <span class="site__title">
+        <a href="https://dylanmeeus.github.io">Dylan Meeus</a>
+      </span>
+      
+      
+        <div class="author-image">
+          <img src="https://www.gravatar.com/avatar/174fdce3b3920fc7b21aff714b0b664d?s=240&d=mp" class="img--circle img--headshot element--center" alt="gravatar">
+        </div>
+      
+      <p class="site__description">
+        
+      </p>
+    </div>
+    <div class="collapsible-menu">
+      <input type="checkbox" id="menuToggle">
+      <label for="menuToggle">Dylan Meeus</label>
+      <div class="menu-content">
+        <div>
+	<ul class="sidebar-nav">
+		 
+		
+	</ul>
+</div>
+
+        <section class="social">
+	
+	<a href="https://twitter.com/DylanMeeus" rel="me"><i class="fab fa-twitter fa-lg" aria-hidden="true"></i></a>
+	
+	
+	
+	<a href="https://github.com/DylanMeeus" rel="me"><i class="fab fa-github fa-lg" aria-hidden="true"></i></a>
+	
+	
+	
+	
+	
+	
+	
+	<a href="https://linkedin.com/in/dylanmeeus" rel="me"><i class="fab fa-linkedin fa-lg" aria-hidden="true"></i></a>
+	
+	
+	
+	
+	
+	
+	
+	
+	
+</section>
+
+      </div>
+    </div>
+    
+
+
+  </div>
+</div>
+
+        <div class="content container">
+            
+    
+<article>
+  <header>
+    <h1>Software Engineering at Google</h1>
+    
+    
+<div class="post__meta">
+    
+    
+      <i class="fas fa-calendar-alt"></i> Aug 25, 2020
+    
+    
+    
+      
+      
+          in
+          
+          
+              <a class="badge badge-category" href="/categories/posts">POSTS</a>
+              
+          
+      
+    
+    
+    
+      
+      
+          <br/>
+           <i class="fas fa-tags"></i>
+          
+          <a class="badge badge-tag" href="/tags/books">books</a>
+          
+      
+    
+    
+    <br/>
+    <i class="fas fa-clock"></i> 5 min read
+</div>
+
+
+  </header>
+  
+  
+  <div class="post">
+    <p>If there was one book this year that it was hard to avoid hearing about, it was &ldquo;Software
+Engineering at Google&rdquo;. As such, it was only a matter of time before I jumped on the bandwagon and
+decided to give it a read, but I&rsquo;m happy I finally did!</p>
+<p>I track my highlights and notes through my kindle / goodreads, and ended up with about 80 of them.
+In this blogpost, I&rsquo;ll just go over some of what that I thought stood out in the book in one way or
+another. In
+general though, the book should probably be some kind of recommended reading material for students
+of software engineering at universities.</p>
+<p><img src="/se-at-google/cover.jpg" alt=""></p>
+<h1 id="software-engineering--programming">Software Engineering != Programming</h1>
+<p>Almost right off the bat (1% into the book according to my highlight), the book starts with a discussion on what they mean with the title
+&lsquo;Software Engineering&rsquo;. It&rsquo;s something I myself have not given too much thought, I consider myself a
+software engineer and <em>part</em> of what I do is programming.</p>
+<p>The way they phrased it, is that &ldquo;Software engineering is programming
+integrated over time&rdquo;. This statement does sum it up quite well (calculus pun intended). If programming is the art of
+writing code, software engineering is the art of making sure this code continues to run in the
+future. This immediately highlights what surrounds programming in the day-to-day of a software
+engineer. Just as in the more &lsquo;traditional&rsquo; engineering fields, once you build something to last
+you want to plan ahead of time. This is where the meetings, design documents, integration tests,
+etc.. enter the picture.</p>
+<p>Once you see the difference between the two, it starts to make sense that the book
+includes only a few lines of code. The book isn&rsquo;t about the programming aspect as much, it&rsquo;s about
+what surrounds it to make it engineering.</p>
+<h1 id="use-tools-to-ensure-compliance">Use tools to ensure compliance</h1>
+<p>This applies to how well the engineers in a company follow things such as the styleguide and that
+unit tests should be written. If you set out some rules, such as &ldquo;never panic your Go code&rdquo;, this
+should be checked automatically through static analysis rather than having it mentioned in a review.</p>
+<p>Of course this makes a lot of sense, but in general it happens that people agree on a convention
+which is written down &ldquo;somewhere&rdquo;, but validating compliance becomes a burden and thus forgotten.
+When a tool can check for compliance, this makes it easier on the developer to know that they are
+doing the right thing, it makes it faster to ensure compliance on a large codebase, and furthermore
+when the rules change a tool could be written to automatically rewrite parts of the codebase that
+need updating.</p>
+<p>In itself, this sounds obvious but it can be harder to do than it sounds at first. Depending on
+which language and framework you are using, these tools might not be provided out of the box,
+meaning that you&rsquo;ll have to spend engineering time on creating these tools in the first place. For
+many smaller software companies this might sound like a waste of time, as the benefit is only
+visible at scale. Personally, I do think that a kind of balance needs to be struck here, for a 2-man
+startup, it would be complete overkill to write your own static analysis tools for every such
+decision that is made. But for larger organizations, it does sounds reasonable.</p>
+<h1 id="hyrums-law">Hyrum&rsquo;s Law</h1>
+<p>Hyrum&rsquo;s Law states that with a sufficient number of users of an API, it does not matter what the
+API promises in the contract, because all observable behaviour will eventually be depended on by somebody.
+I&rsquo;m not as conscious of this as I should be. Especially for an open source project this is something
+to keep in mind. Whenever you change your API, even if you change something that&rsquo;s technically
+&lsquo;undocumented&rsquo; or wasn&rsquo;t &ldquo;the intended use case&rdquo;, you&rsquo;re going to make some people unhappy.</p>
+<p>When you control everything, meaning you develop internal tools, these kinds of suble breaking
+changes might be easier to push through, as you can fix the code of whomever depends on it. When you
+make such a change in an open source project depended on by thousands, or millions, the cost is way
+higher.</p>
+<p>I can imagine scenarios where this trade-off is genuinely hard though. What if you know people are
+using your API in a way that was unexpected, by relying on a bug? Should you still fix that bug? You
+can create a new function without the bug, but now it might be more confusing for future users to
+understand what is going on. I don&rsquo;t have an answer to this, I don&rsquo;t recall that the book had one.</p>
+<h1 id="relationships-outlast-projects">Relationships outlast projects</h1>
+<p>There are quite a few chapters in the book that talk about the &lsquo;management&rsquo; side of things. Building
+relationships and networking is definitely valuable, it&rsquo;s just good to be reminded of this every now
+and then.</p>
+<h1 id="give-junior-members-space-to-grow">Give junior members space to grow</h1>
+<p>In one of the chapters they mention that as a tech lead it can be hard to see a junior colleague
+struggle with a problem, when you know that the problem would be solved in half an hour if you
+did it yourself. Here they urge you to let the junior developer try for some time, as having them
+learn on their own can be a valuable experience. You don&rsquo;t have to forsake them of course, you can
+nudge them in the right direction and assist them with things when they need it. But don&rsquo;t do the
+work for them just because it would take them longer. Give them space and time to grow.</p>
+<hr>
+<p>If you liked this and want to know when I write new posts, the best way to keep up to date is by <a href="https://twitter.com/DylanMeeus">following me on
+twitter</a>.</p>
+
+  </div>
+  
+
+<div class="navigation navigation-single">
+    
+    <a href="/posts/audio-from-scratch-pt8/" class="navigation-prev">
+      <i aria-hidden="true" class="fa fa-chevron-left"></i>
+      <span class="navigation-tittle">Audio From Scratch With Go: Waveform synthesis</span>
+    </a>
+    
+    
+</div>
+
+
+  
+
+  
+    
+
+
+</article>
+
+
+        </div>
+        
+    
+
+  
+  
+<script type="application/javascript">
+var doNotTrack = false;
+if (!doNotTrack) {
+	window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+	ga('create', 'UA-172416417-1', 'auto');
+	
+	ga('send', 'pageview');
+}
+</script>
+<script async src='https://www.google-analytics.com/analytics.js'></script>
+
+
+<script defer src="https://use.fontawesome.com/releases/v5.11.2/js/all.js" integrity="sha384-b3ua1l97aVGAPEIe48b4TC60WUQbQaGi2jqAWM90y0OZXZeyaTCWtBTKtjW2GXG1" crossorigin="anonymous"></script>
+
+
+
+
+    
+
+
+
+    </body>
+</html>
