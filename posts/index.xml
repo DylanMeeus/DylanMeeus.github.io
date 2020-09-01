@@ -6,10 +6,20 @@
     <description>Recent content in Posts on Dylan Meeus</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Tue, 25 Aug 2020 19:57:06 +0200</lastBuildDate>
+    <lastBuildDate>Mon, 31 Aug 2020 21:01:02 +0200</lastBuildDate>
     
 	<atom:link href="https://dylanmeeus.github.io/posts/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>Audio From Scratch: Waveform tables</title>
+      <link>https://dylanmeeus.github.io/posts/audio-from-scratch-pt9/</link>
+      <pubDate>Mon, 31 Aug 2020 21:01:02 +0200</pubDate>
+      
+      <guid>https://dylanmeeus.github.io/posts/audio-from-scratch-pt9/</guid>
+      <description>In the previous post the aim was to synthesize different waveforms, such as triangle waves and square waves. While this implementation gives us a good start, it is not as performant as we would like. All these waveforms were cyclical, so there was not an actual need to always calculate the right value in the moment.
+The solution when you don&amp;rsquo;t want to recalculate something over and over is caching, and in the case of audio progamming we are going to store the waveform in a &amp;lsquo;table&amp;rsquo;, through which we can look up the values with an Oscillator.</description>
+    </item>
     
     <item>
       <title>Software Engineering at Google</title>

@@ -24,7 +24,7 @@
 <meta property="og:description" content="" />
 <meta property="og:type" content="website" />
 <meta property="og:url" content="https://dylanmeeus.github.io/" />
-<meta property="og:updated_time" content="2020-08-25T19:57:06+02:00" />
+<meta property="og:updated_time" content="2020-08-31T21:01:02+02:00" />
 
 
     
@@ -152,6 +152,28 @@ if (!doNotTrack) {
   <div class="post-list">
     
     
+      
+        
+      
+      <div class="post-list__item">
+        <span class="item__title--big">
+          <a href="/posts/audio-from-scratch-pt9/" >Audio From Scratch: Waveform tables</a>
+        </span>
+        <span class="item__date">
+          Aug 31, 2020
+        </span>
+        <span >
+        
+        In the previous post the aim was to synthesize different waveforms, such as triangle waves and square waves. While this implementation gives us a good start, it is not as performant as we would like. All these waveforms were cyclical, so there was not an actual need to always calculate the right value in the moment.
+The solution when you don&rsquo;t want to recalculate something over and over is caching, and in the case of audio progamming we are going to store the waveform in a &lsquo;table&rsquo;, through which we can look up the values with an Oscillator.
+        
+        </span>
+        
+          ... <a class="read-more-symbol" href="/posts/audio-from-scratch-pt9/">➦</a>
+        
+        </div>
+        
+     
       
         
       
@@ -349,28 +371,6 @@ But, in this post we’ll be using Go to create sound from scratch in binary for
         </span>
         
           ... <a class="read-more-symbol" href="/posts/audio-from-scratch-pt1/">➦</a>
-        
-        </div>
-        
-     
-      
-        
-      
-      <div class="post-list__item">
-        <span class="item__title--big">
-          <a href="/posts/hasgo/" >Hasgo: how does it work?</a>
-        </span>
-        <span class="item__date">
-          May 25, 2019
-        </span>
-        <span >
-        
-        What is Hasgo? Hasgo is a code generator that can be used to generate functions that work on slices. We don&rsquo;t have generics in Go, which I think is a good thing, but we can generate code with go:generate to work on different types.
-Hasgo does just this, we write functions and then say for which types we want to generate these functions. For our Ints, the generation looks like this:
-        
-        </span>
-        
-          ... <a class="read-more-symbol" href="/posts/hasgo/">➦</a>
         
         </div>
         

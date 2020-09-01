@@ -1,0 +1,550 @@
+<!DOCTYPE html>
+<html lang="en-us">
+    
+    
+
+
+    <head>
+    <link href="https://gmpg.org/xfn/11" rel="profile">
+    <meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta http-equiv="Cache-Control" content="public" />
+<!-- Enable responsiveness on mobile devices -->
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+<meta name="generator" content="Hugo 0.73.0" />
+
+    
+    
+    
+
+<title>Audio From Scratch: Waveform tables • Dylan Meeus</title>
+
+
+<meta name="twitter:card" content="summary_large_image"/>
+<meta name="twitter:image" content="https://dylanmeeus.github.io/audio/part9/halfsampling.png"/>
+
+<meta name="twitter:title" content="Audio From Scratch: Waveform tables"/>
+<meta name="twitter:description" content="In the previous post the aim was to synthesize different waveforms, such as triangle waves and square waves. While this implementation gives us a good start, it is not as performant as we would like. All these waveforms were cyclical, so there was not an actual need to always calculate the right value in the moment.
+The solution when you don&rsquo;t want to recalculate something over and over is caching, and in the case of audio progamming we are going to store the waveform in a &lsquo;table&rsquo;, through which we can look up the values with an Oscillator."/>
+<meta name="twitter:site" content="@DylanMeeus"/>
+
+<meta property="og:title" content="Audio From Scratch: Waveform tables" />
+<meta property="og:description" content="In the previous post the aim was to synthesize different waveforms, such as triangle waves and square waves. While this implementation gives us a good start, it is not as performant as we would like. All these waveforms were cyclical, so there was not an actual need to always calculate the right value in the moment.
+The solution when you don&rsquo;t want to recalculate something over and over is caching, and in the case of audio progamming we are going to store the waveform in a &lsquo;table&rsquo;, through which we can look up the values with an Oscillator." />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://dylanmeeus.github.io/posts/audio-from-scratch-pt9/" />
+<meta property="og:image" content="https://dylanmeeus.github.io/audio/part9/halfsampling.png" />
+<meta property="article:published_time" content="2020-08-31T21:01:02+02:00" />
+<meta property="article:modified_time" content="2020-08-31T21:01:02+02:00" />
+
+
+    
+
+
+
+
+
+
+<link rel="stylesheet" href="/scss/hyde-hyde.6a83d62c39a364f036df4db1ecd564645635d6c7fc182425cb501218fec485f5.css" integrity="sha256-aoPWLDmjZPA2302x7NVkZFY11sf8GCQly1ASGP7EhfU=">
+
+
+<link rel="stylesheet" href="/scss/print.2744dcbf8a0b2e74f8a50e4b34e5f441be7cf93cc7de27029121c6a09f9e77bc.css" integrity="sha256-J0Tcv4oLLnT4pQ5LNOX0Qb58&#43;TzH3icCkSHGoJ&#43;ed7w=" media="print">
+
+
+
+
+    
+<script type="application/javascript">
+var doNotTrack = false;
+if (!doNotTrack) {
+	(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+	(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+	m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+	})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+	ga('create', 'UA-172416417-1', 'auto');
+	
+	ga('send', 'pageview');
+}
+</script>
+
+    
+<script type="application/javascript">
+var doNotTrack = false;
+if (!doNotTrack) {
+	window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+	ga('create', 'UA-172416417-1', 'auto');
+	
+	ga('send', 'pageview');
+}
+</script>
+<script async src='https://www.google-analytics.com/analytics.js'></script>
+
+
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+    <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
+    <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+    <!-- Icons -->
+    <link rel="apple-touch-icon-precomposed" sizes="144x144" href="/apple-touch-icon-144-precomposed.png">
+    <link rel="shortcut icon" href="/favicon.png">
+    
+    
+
+</head>
+
+
+    <body class=" ">
+    
+<div class="sidebar">
+  <div class="container ">
+    <div class="sidebar-about">
+      <span class="site__title">
+        <a href="https://dylanmeeus.github.io">Dylan Meeus</a>
+      </span>
+      
+      
+        <div class="author-image">
+          <img src="https://www.gravatar.com/avatar/174fdce3b3920fc7b21aff714b0b664d?s=240&d=mp" class="img--circle img--headshot element--center" alt="gravatar">
+        </div>
+      
+      <p class="site__description">
+        
+      </p>
+    </div>
+    <div class="collapsible-menu">
+      <input type="checkbox" id="menuToggle">
+      <label for="menuToggle">Dylan Meeus</label>
+      <div class="menu-content">
+        <div>
+	<ul class="sidebar-nav">
+		 
+		
+	</ul>
+</div>
+
+        <section class="social">
+	
+	<a href="https://twitter.com/DylanMeeus" rel="me"><i class="fab fa-twitter fa-lg" aria-hidden="true"></i></a>
+	
+	
+	
+	<a href="https://github.com/DylanMeeus" rel="me"><i class="fab fa-github fa-lg" aria-hidden="true"></i></a>
+	
+	
+	
+	
+	
+	
+	
+	<a href="https://linkedin.com/in/dylanmeeus" rel="me"><i class="fab fa-linkedin fa-lg" aria-hidden="true"></i></a>
+	
+	
+	
+	
+	
+	
+	
+	
+	
+</section>
+
+      </div>
+    </div>
+    
+
+
+  </div>
+</div>
+
+        <div class="content container">
+            
+    
+<article>
+  <header>
+    <h1>Audio From Scratch: Waveform tables</h1>
+    
+    
+<div class="post__meta">
+    
+    
+      <i class="fas fa-calendar-alt"></i> Aug 31, 2020
+    
+    
+    
+      
+      
+          in
+          
+          
+              <a class="badge badge-category" href="/categories/posts">POSTS</a>
+              
+          
+      
+    
+    
+    
+      
+      
+          <br/>
+           <i class="fas fa-tags"></i>
+          
+          <a class="badge badge-tag" href="/tags/audio">audio</a>
+           
+      
+          <a class="badge badge-tag" href="/tags/go">go</a>
+           
+      
+          <a class="badge badge-tag" href="/tags/goaudio">goaudio</a>
+          
+      
+    
+    
+    <br/>
+    <i class="fas fa-clock"></i> 7 min read
+</div>
+
+
+  </header>
+  
+  
+  <div class="post">
+    <p>In the <a href="https://dylanmeeus.github.io/posts/audio-from-scratch-pt8">previous post</a> the aim was to
+synthesize different waveforms, such as triangle waves and square waves. While this implementation
+gives us a good start, it is not as performant as we would like. All these waveforms were cyclical,
+so there was not an actual need to always calculate the right value in the moment.</p>
+<p>The solution when you don&rsquo;t want to recalculate something over and over is caching, and in the case
+of audio progamming we are going to store the waveform in a &lsquo;table&rsquo;, through which we can look up
+the values with an Oscillator. In general we will want to store one cycle of the waveform at a
+chosen fidelity, where the fidelity / precision is determined by how many points we store.</p>
+<p>As we are chunking the wave in smaller points, we might not be able to retrieve the exact value of
+the wave at a given timestamp. To solve this, we will use linear interpolation to estimate a value
+for the missing timestamp, similar to how we resolved finding the correct value for
+<a href="https://dylanmeeus.github.io/posts/audio-from-scratch-pt5">breakpoints</a>.</p>
+<h2 id="building-the-table">Building the table</h2>
+<p>Fundamentally there are two parts to this problem, first we need to figure out how to store the
+waveform in a table, and next we need to figure out how we can read this data from the table at the
+correct frequency.</p>
+<p>For storing the waveform, we will want to store <code>X</code> data points along the wave. These data points
+are the samples that we are taking. In an analog signal we have a continous wave, when we convert it
+to a digital signal it becomes discrete, but for a large enough <code>X</code> it becomes indistinguishable
+from the real signal. (This equivalence will help us down the road as well, when we start reasoning
+about manipulation of this signal).</p>
+<p>In the figure below we can see how the sampling rate impacts how many snapshots we take of the
+signal.</p>
+<p><img src="/audio/part9/sampling.png" alt="Sampled sine wave"></p>
+<p>If we were to take half the sampling rate, we&rsquo;d only get 4 data points of our wave.
+There is actualy a limit to the sample rate that we can use for a given signal.
+This is known as the <a href="https://en.wikipedia.org/wiki/Nyquist_frequency">Nyquist Limit</a>, and for now
+we will just aknowledge this exists and move on, content for another post. ;-)</p>
+<p><img src="/audio/part9/halfsampling.png" alt="Sampled at half the rate"></p>
+<p>To figure out the spacing between each point we can use <code>step = (2*PI)/X</code>. Once we have this, we
+loop from <code>0 -&gt; X</code> and generate the expected value. For the sine wave, this then becomes:</p>
+<div class="highlight"><div style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4">
+<table style="border-spacing:0;padding:0;margin:0;border:0;width:auto;overflow:auto;display:block;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 2
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 3
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 4
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 5
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 6
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 7
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 8
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 9
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">10
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">11
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">12
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">13
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">14
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">15
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">16
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">17
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">18
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#66d9ef">type</span> <span style="color:#a6e22e">Gtable</span> <span style="color:#66d9ef">struct</span> {
+	<span style="color:#a6e22e">data</span> []<span style="color:#66d9ef">float64</span>
+}
+
+<span style="color:#66d9ef">func</span> <span style="color:#a6e22e">NewSineTable</span>(<span style="color:#a6e22e">length</span> <span style="color:#66d9ef">int</span>) <span style="color:#f92672">*</span><span style="color:#a6e22e">Gtable</span> {
+	<span style="color:#a6e22e">g</span> <span style="color:#f92672">:=</span> <span style="color:#f92672">&amp;</span><span style="color:#a6e22e">Gtable</span>{}
+	<span style="color:#66d9ef">if</span> <span style="color:#a6e22e">length</span> <span style="color:#f92672">==</span> <span style="color:#ae81ff">0</span> {
+		<span style="color:#66d9ef">return</span> <span style="color:#a6e22e">g</span>
+	}
+	<span style="color:#a6e22e">g</span>.<span style="color:#a6e22e">data</span> = make([]<span style="color:#66d9ef">float64</span>, <span style="color:#a6e22e">length</span><span style="color:#f92672">+</span><span style="color:#ae81ff">1</span>) <span style="color:#75715e">// one extra for the guard point.
+</span><span style="color:#75715e"></span>	<span style="color:#a6e22e">step</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">tau</span> <span style="color:#f92672">/</span> float64(<span style="color:#a6e22e">Len</span>(<span style="color:#a6e22e">g</span>))
+	<span style="color:#66d9ef">for</span> <span style="color:#a6e22e">i</span> <span style="color:#f92672">:=</span> <span style="color:#ae81ff">0</span>; <span style="color:#a6e22e">i</span> &lt; <span style="color:#a6e22e">Len</span>(<span style="color:#a6e22e">g</span>); <span style="color:#a6e22e">i</span><span style="color:#f92672">++</span> {
+		<span style="color:#a6e22e">g</span>.<span style="color:#a6e22e">data</span>[<span style="color:#a6e22e">i</span>] = <span style="color:#a6e22e">math</span>.<span style="color:#a6e22e">Sin</span>(<span style="color:#a6e22e">step</span> <span style="color:#f92672">*</span> float64(<span style="color:#a6e22e">i</span>))
+	}
+	<span style="color:#75715e">// store a guard point
+</span><span style="color:#75715e"></span>	<span style="color:#a6e22e">g</span>.<span style="color:#a6e22e">data</span>[len(<span style="color:#a6e22e">g</span>.<span style="color:#a6e22e">data</span>)<span style="color:#f92672">-</span><span style="color:#ae81ff">1</span>] = <span style="color:#a6e22e">g</span>.<span style="color:#a6e22e">data</span>[<span style="color:#ae81ff">0</span>]
+	<span style="color:#66d9ef">return</span> <span style="color:#a6e22e">g</span>
+}
+</code></pre></td></tr></table>
+</div>
+</div><p>The last bit, where the final entry in our table is equal to the first entry will help us with the
+linear interpolation in our oscillator. It&rsquo;s not too important to worry about this for now. Also
+remember that in the code, we use <code>tau = 2 * PI</code>.</p>
+<h3 id="oscillator">Oscillator</h3>
+<p>Storing the data is an important step, but we need to utilize this data to get any sound out of it.
+For this, we will adapt the oscillator <a href="https://dylanmeeus.github.io/posts/audio-from-scratch-pt8.md">of the last
+post</a>. Large parts of this code should
+look familiar though.</p>
+<p>First, we need to adapt our Oscillator so it can store a reference to the table, and for convenience
+also the &ldquo;size over sample rate&rdquo; variable, which is a small adaptation from our earlier &ldquo;tau over
+sample rate&rdquo;. The constructor will also need a slight adaptation to make create an instance of this
+struct.</p>
+<div class="highlight"><div style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4">
+<table style="border-spacing:0;padding:0;margin:0;border:0;width:auto;overflow:auto;display:block;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 2
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 3
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 4
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 5
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 6
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 7
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 8
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 9
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">10
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">11
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">12
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">13
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">14
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">15
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">16
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">17
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">18
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">19
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">20
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">21
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">22
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#66d9ef">type</span> <span style="color:#a6e22e">LookupOscillator</span> <span style="color:#66d9ef">struct</span> {
+	<span style="color:#a6e22e">Oscillator</span>
+	<span style="color:#a6e22e">Table</span>      <span style="color:#f92672">*</span><span style="color:#a6e22e">Gtable</span>
+	<span style="color:#a6e22e">SizeOverSr</span> <span style="color:#66d9ef">float64</span> <span style="color:#75715e">// convenience variable for calculations
+</span><span style="color:#75715e"></span>}
+
+
+<span style="color:#66d9ef">func</span> <span style="color:#a6e22e">NewLookupOscillator</span>(<span style="color:#a6e22e">sr</span> <span style="color:#66d9ef">int</span>, <span style="color:#a6e22e">t</span> <span style="color:#f92672">*</span><span style="color:#a6e22e">Gtable</span>, <span style="color:#a6e22e">phase</span> <span style="color:#66d9ef">float64</span>) (<span style="color:#f92672">*</span><span style="color:#a6e22e">LookupOscillator</span>, <span style="color:#66d9ef">error</span>) {
+	<span style="color:#66d9ef">if</span> <span style="color:#a6e22e">t</span> <span style="color:#f92672">==</span> <span style="color:#66d9ef">nil</span> <span style="color:#f92672">||</span> len(<span style="color:#a6e22e">t</span>.<span style="color:#a6e22e">data</span>) <span style="color:#f92672">==</span> <span style="color:#ae81ff">0</span> {
+		<span style="color:#66d9ef">return</span> <span style="color:#66d9ef">nil</span>, <span style="color:#a6e22e">errors</span>.<span style="color:#a6e22e">New</span>(<span style="color:#e6db74">&#34;Invalid table provided for lookup oscillator&#34;</span>)
+	}
+
+	<span style="color:#66d9ef">return</span> <span style="color:#f92672">&amp;</span><span style="color:#a6e22e">LookupOscillator</span>{
+		<span style="color:#a6e22e">Oscillator</span>: <span style="color:#a6e22e">Oscillator</span>{
+			<span style="color:#a6e22e">curfreq</span>:  <span style="color:#ae81ff">0.0</span>,
+			<span style="color:#a6e22e">curphase</span>: float64(<span style="color:#a6e22e">Len</span>(<span style="color:#a6e22e">t</span>)) <span style="color:#f92672">*</span> <span style="color:#a6e22e">phase</span>,
+			<span style="color:#a6e22e">incr</span>:     <span style="color:#ae81ff">0.0</span>,
+		},
+		<span style="color:#a6e22e">Table</span>:      <span style="color:#a6e22e">t</span>,
+		<span style="color:#a6e22e">SizeOverSr</span>: float64(<span style="color:#a6e22e">Len</span>(<span style="color:#a6e22e">t</span>)) <span style="color:#f92672">/</span> float64(<span style="color:#a6e22e">sr</span>),
+	}, <span style="color:#66d9ef">nil</span>
+}
+</code></pre></td></tr></table>
+</div>
+</div><p>Large parts here actually remain the same. The main difference is in how we actually retrieve the
+next float value during oscillation. When we generate our waveform, it can happen that we request a
+part of the waveform at a timestamp that is not stored in the table. At this point, we have to
+either infer the value using linear interpolation, or truncate the result.</p>
+<p>Truncating the result simply means that we accept our results to be incorrect but instead of
+interpolating a result closer to the truth, we accept that we lose some fidelity. This might not
+necessarily be a bad thing though! If our table contains sufficient data points, the difference
+between each data point will be small. Thus no artifacts from truncating might be audible. At which
+point is this the case? Honestly, no idea, but it could be interesting to test. :-)</p>
+<p>Since it&rsquo;s simple to implement, let&rsquo;s start with the truncating lookup. Notice that we also request
+a certain frequency with which we&rsquo;ll move through the waveform.</p>
+<div class="highlight"><div style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4">
+<table style="border-spacing:0;padding:0;margin:0;border:0;width:auto;overflow:auto;display:block;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 2
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 3
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 4
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 5
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 6
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 7
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 8
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 9
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">10
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">11
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">12
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">13
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">14
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">15
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">16
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">17
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#66d9ef">func</span> (<span style="color:#a6e22e">l</span> <span style="color:#f92672">*</span><span style="color:#a6e22e">LookupOscillator</span>) <span style="color:#a6e22e">TruncateTick</span>(<span style="color:#a6e22e">freq</span> <span style="color:#66d9ef">float64</span>) []<span style="color:#66d9ef">float64</span> {
+            <span style="color:#a6e22e">index</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">l</span>.<span style="color:#a6e22e">curphase</span>
+            <span style="color:#66d9ef">if</span> <span style="color:#a6e22e">l</span>.<span style="color:#a6e22e">curfreq</span> <span style="color:#f92672">!=</span> <span style="color:#a6e22e">freq</span> {
+                    <span style="color:#a6e22e">l</span>.<span style="color:#a6e22e">curfreq</span> = <span style="color:#a6e22e">freq</span>
+                    <span style="color:#a6e22e">l</span>.<span style="color:#a6e22e">incr</span> = <span style="color:#a6e22e">l</span>.<span style="color:#a6e22e">SizeOverSr</span> <span style="color:#f92672">*</span> <span style="color:#a6e22e">l</span>.<span style="color:#a6e22e">curfreq</span>
+            }
+            <span style="color:#a6e22e">curphase</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">l</span>.<span style="color:#a6e22e">curphase</span>
+            <span style="color:#a6e22e">curphase</span> <span style="color:#f92672">+=</span> <span style="color:#a6e22e">l</span>.<span style="color:#a6e22e">incr</span>
+            <span style="color:#66d9ef">for</span> <span style="color:#a6e22e">curphase</span> &gt; float64(<span style="color:#a6e22e">Len</span>(<span style="color:#a6e22e">l</span>.<span style="color:#a6e22e">Table</span>)) {
+                    <span style="color:#a6e22e">curphase</span> <span style="color:#f92672">-=</span> float64(<span style="color:#a6e22e">Len</span>(<span style="color:#a6e22e">l</span>.<span style="color:#a6e22e">Table</span>))
+            }
+            <span style="color:#66d9ef">for</span> <span style="color:#a6e22e">curphase</span> &lt; <span style="color:#ae81ff">0.0</span> {
+                    <span style="color:#a6e22e">curphase</span> <span style="color:#f92672">+=</span> float64(<span style="color:#a6e22e">Len</span>(<span style="color:#a6e22e">l</span>.<span style="color:#a6e22e">Table</span>))
+            }
+            <span style="color:#a6e22e">l</span>.<span style="color:#a6e22e">curphase</span> = <span style="color:#a6e22e">curphase</span>
+            <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">l</span>.<span style="color:#a6e22e">Table</span>.<span style="color:#a6e22e">data</span>[int(<span style="color:#a6e22e">index</span>)]
+} 
+</code></pre></td></tr></table>
+</div>
+</div><p>This is rather analogous to what we have been doing so far. With each tick we increment the phase to
+produce the next part of the wave. If we are outside the scope of our table, we resize to be within
+bounds again.</p>
+<p>The truncating happens in the last line, the requested index that we found for a given phase might
+not be an index in the table. This is likely to happen frequently as our indices are ints and our
+phase is a float. Imagine our phase value is &ldquo;10.15&rdquo;, in the table we might find for those indices:</p>
+<table>
+<thead>
+<tr>
+<th>index</th>
+<th>value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>&hellip;..</td>
+<td>&hellip;..</td>
+</tr>
+<tr>
+<td>10</td>
+<td>0.75</td>
+</tr>
+<tr>
+<td>11</td>
+<td>0.80</td>
+</tr>
+<tr>
+<td>12</td>
+<td>0.85</td>
+</tr>
+</tbody>
+</table>
+<p>Rather than being smart and finding the value approx 0.15 ticks past <code>0.75</code> by interpolating between the
+value for index 10 and 11, we just return <code>0.75</code>. Here each index incremented the value by 0.05,
+which is determined by how many points we store in our table. More points = smaller increments =
+less data lost when truncating.</p>
+<p>For implementing the linear interpolation oscillator, we can apply the same strategy as when we
+<a href="https://dylanmeeus.github.io/posts/audio-from-scratch-pt5/">implemented breakpoints</a>. The majority
+of the oscillator code remains the same, except that we&rsquo;ll look for the two indices that our
+requested phase sits inbetween of.</p>
+<div class="highlight"><div style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4">
+<table style="border-spacing:0;padding:0;margin:0;border:0;width:auto;overflow:auto;display:block;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 2
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 3
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 4
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 5
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 6
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 7
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 8
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 9
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">10
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">11
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">12
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">13
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">14
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">15
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">16
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">17
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">18
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">19
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">20
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">21
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">22
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">23
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#66d9ef">func</span> (<span style="color:#a6e22e">l</span> <span style="color:#f92672">*</span><span style="color:#a6e22e">LookupOscillator</span>) <span style="color:#a6e22e">InterpolateTick</span>(<span style="color:#a6e22e">freq</span> <span style="color:#66d9ef">float64</span>) <span style="color:#66d9ef">float64</span> {
+		<span style="color:#a6e22e">baseIndex</span> <span style="color:#f92672">:=</span> int(<span style="color:#a6e22e">l</span>.<span style="color:#a6e22e">curphase</span>)
+		<span style="color:#a6e22e">nextIndex</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">baseIndex</span> <span style="color:#f92672">+</span> <span style="color:#ae81ff">1</span>
+		<span style="color:#66d9ef">if</span> <span style="color:#a6e22e">l</span>.<span style="color:#a6e22e">curfreq</span> <span style="color:#f92672">!=</span> <span style="color:#a6e22e">freq</span> {
+			<span style="color:#a6e22e">l</span>.<span style="color:#a6e22e">curfreq</span> = <span style="color:#a6e22e">freq</span>
+			<span style="color:#a6e22e">l</span>.<span style="color:#a6e22e">incr</span> = <span style="color:#a6e22e">l</span>.<span style="color:#a6e22e">SizeOverSr</span> <span style="color:#f92672">*</span> <span style="color:#a6e22e">l</span>.<span style="color:#a6e22e">curfreq</span>
+		}
+		<span style="color:#a6e22e">curphase</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">l</span>.<span style="color:#a6e22e">curphase</span>
+		<span style="color:#a6e22e">frac</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">curphase</span> <span style="color:#f92672">-</span> float64(<span style="color:#a6e22e">baseIndex</span>)
+		<span style="color:#a6e22e">val</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">l</span>.<span style="color:#a6e22e">Table</span>.<span style="color:#a6e22e">data</span>[<span style="color:#a6e22e">baseIndex</span>]
+		<span style="color:#a6e22e">slope</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">l</span>.<span style="color:#a6e22e">Table</span>.<span style="color:#a6e22e">data</span>[<span style="color:#a6e22e">nextIndex</span>] <span style="color:#f92672">-</span> <span style="color:#a6e22e">val</span>
+		<span style="color:#a6e22e">val</span> <span style="color:#f92672">+=</span> <span style="color:#a6e22e">frac</span> <span style="color:#f92672">*</span> <span style="color:#a6e22e">slope</span>
+		<span style="color:#a6e22e">curphase</span> <span style="color:#f92672">+=</span> <span style="color:#a6e22e">l</span>.<span style="color:#a6e22e">incr</span>
+
+		<span style="color:#66d9ef">for</span> <span style="color:#a6e22e">curphase</span> &gt; float64(<span style="color:#a6e22e">Len</span>(<span style="color:#a6e22e">l</span>.<span style="color:#a6e22e">Table</span>)) {
+			<span style="color:#a6e22e">curphase</span> <span style="color:#f92672">-=</span> float64(<span style="color:#a6e22e">Len</span>(<span style="color:#a6e22e">l</span>.<span style="color:#a6e22e">Table</span>))
+		}
+		<span style="color:#66d9ef">for</span> <span style="color:#a6e22e">curphase</span> &lt; <span style="color:#ae81ff">0.0</span> {
+			<span style="color:#a6e22e">curphase</span> <span style="color:#f92672">+=</span> float64(<span style="color:#a6e22e">Len</span>(<span style="color:#a6e22e">l</span>.<span style="color:#a6e22e">Table</span>))
+		}
+		<span style="color:#a6e22e">l</span>.<span style="color:#a6e22e">curphase</span> = <span style="color:#a6e22e">curphase</span>
+                <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">out</span>
+}
+</code></pre></td></tr></table>
+</div>
+</div><p>As you can tell, most of the code is an extention to what we&rsquo;ve written before.</p>
+<h1 id="resources">Resources</h1>
+<ul>
+<li><a href="https://github.com/DylanMeeus/GoAudio">GoAudio</a></li>
+</ul>
+<hr>
+<p>If you liked this and want to know when I write new posts, the best way to keep up to date is by <a href="https://twitter.com/DylanMeeus">following me on
+twitter</a>.</p>
+
+  </div>
+  
+
+<div class="navigation navigation-single">
+    
+    <a href="/posts/software-engineering-at-google/" class="navigation-prev">
+      <i aria-hidden="true" class="fa fa-chevron-left"></i>
+      <span class="navigation-tittle">Software Engineering at Google</span>
+    </a>
+    
+    
+</div>
+
+
+  
+
+  
+    
+
+
+</article>
+
+
+        </div>
+        
+    
+
+  
+  
+<script type="application/javascript">
+var doNotTrack = false;
+if (!doNotTrack) {
+	window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+	ga('create', 'UA-172416417-1', 'auto');
+	
+	ga('send', 'pageview');
+}
+</script>
+<script async src='https://www.google-analytics.com/analytics.js'></script>
+
+
+<script defer src="https://use.fontawesome.com/releases/v5.11.2/js/all.js" integrity="sha384-b3ua1l97aVGAPEIe48b4TC60WUQbQaGi2jqAWM90y0OZXZeyaTCWtBTKtjW2GXG1" crossorigin="anonymous"></script>
+
+
+
+
+    
+
+
+
+    </body>
+</html>
