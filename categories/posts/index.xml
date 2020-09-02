@@ -12,23 +12,13 @@
     
     
     <item>
-      <title>Audio From Scratch: Waveform tables</title>
+      <title>Audio From Scratch With Go: Waveform tables</title>
       <link>https://dylanmeeus.github.io/posts/audio-from-scratch-pt9/</link>
       <pubDate>Mon, 31 Aug 2020 21:01:02 +0200</pubDate>
       
       <guid>https://dylanmeeus.github.io/posts/audio-from-scratch-pt9/</guid>
       <description>In the previous post the aim was to synthesize different waveforms, such as triangle waves and square waves. While this implementation gives us a good start, it is not as performant as we would like. All these waveforms were cyclical, so there was not an actual need to always calculate the right value in the moment.
 The solution when you don&amp;rsquo;t want to recalculate something over and over is caching, and in the case of audio progamming we are going to store the waveform in a &amp;lsquo;table&amp;rsquo;, through which we can look up the values with an Oscillator.</description>
-    </item>
-    
-    <item>
-      <title>Software Engineering at Google</title>
-      <link>https://dylanmeeus.github.io/posts/software-engineering-at-google/</link>
-      <pubDate>Tue, 25 Aug 2020 19:57:06 +0200</pubDate>
-      
-      <guid>https://dylanmeeus.github.io/posts/software-engineering-at-google/</guid>
-      <description>If there was one book this year that it was hard to avoid hearing about, it was &amp;ldquo;Software Engineering at Google&amp;rdquo;. As such, it was only a matter of time before I jumped on the bandwagon and decided to give it a read, but I&amp;rsquo;m happy I finally did!
-I track my highlights and notes through my kindle / goodreads, and ended up with about 80 of them. In this blogpost, I&amp;rsquo;ll just go over some of what that I thought stood out in the book in one way or another.</description>
     </item>
     
     <item>
