@@ -6,10 +6,20 @@
     <description>Recent content on Dylan Meeus</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Mon, 31 Aug 2020 21:01:02 +0200</lastBuildDate>
+    <lastBuildDate>Sat, 05 Sep 2020 14:01:57 +0200</lastBuildDate>
     
 	<atom:link href="https://dylanmeeus.github.io/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>Audio From Scratch With Go: ADSR</title>
+      <link>https://dylanmeeus.github.io/posts/audio-from-scratch-pt10/</link>
+      <pubDate>Sat, 05 Sep 2020 14:01:57 +0200</pubDate>
+      
+      <guid>https://dylanmeeus.github.io/posts/audio-from-scratch-pt10/</guid>
+      <description>With everything that we have added to our library so far we are almost capable of generated small tunes. One thing that&amp;rsquo;s missing to make it sound more &amp;lsquo;natural&amp;rsquo; is a way for the notes to start and stop.
+In this post we will implement a type of envelope called &amp;ldquo;ADSR&amp;rdquo;, for &amp;ldquo;Attack, Decay, Sustain, Release&amp;rdquo;. Which will make the notes sound more natural as they are played in sequence.</description>
+    </item>
     
     <item>
       <title>Audio From Scratch With Go: Waveform tables</title>

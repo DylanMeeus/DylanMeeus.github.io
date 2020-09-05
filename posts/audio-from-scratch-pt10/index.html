@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="en-us">
+    
+    
+
+
+    <head>
+    <link href="https://gmpg.org/xfn/11" rel="profile">
+    <meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta http-equiv="Cache-Control" content="public" />
+<!-- Enable responsiveness on mobile devices -->
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+<meta name="generator" content="Hugo 0.73.0" />
+
+    
+    
+    
+
+<title>Audio From Scratch With Go: ADSR • Dylan Meeus</title>
+
+
+<meta name="twitter:card" content="summary_large_image"/>
+<meta name="twitter:image" content="https://dylanmeeus.github.io/audio/part10/adsrschema.png"/>
+
+<meta name="twitter:title" content="Audio From Scratch With Go: ADSR"/>
+<meta name="twitter:description" content="With everything that we have added to our library so far we are almost capable of generated small tunes. One thing that&rsquo;s missing to make it sound more &lsquo;natural&rsquo; is a way for the notes to start and stop.
+In this post we will implement a type of envelope called &ldquo;ADSR&rdquo;, for &ldquo;Attack, Decay, Sustain, Release&rdquo;. Which will make the notes sound more natural as they are played in sequence."/>
+<meta name="twitter:site" content="@DylanMeeus"/>
+
+<meta property="og:title" content="Audio From Scratch With Go: ADSR" />
+<meta property="og:description" content="With everything that we have added to our library so far we are almost capable of generated small tunes. One thing that&rsquo;s missing to make it sound more &lsquo;natural&rsquo; is a way for the notes to start and stop.
+In this post we will implement a type of envelope called &ldquo;ADSR&rdquo;, for &ldquo;Attack, Decay, Sustain, Release&rdquo;. Which will make the notes sound more natural as they are played in sequence." />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://dylanmeeus.github.io/posts/audio-from-scratch-pt10/" />
+<meta property="og:image" content="https://dylanmeeus.github.io/audio/part10/adsrschema.png" />
+<meta property="article:published_time" content="2020-09-05T14:01:57+02:00" />
+<meta property="article:modified_time" content="2020-09-05T14:01:57+02:00" />
+
+
+    
+
+
+
+
+
+
+<link rel="stylesheet" href="/scss/hyde-hyde.6a83d62c39a364f036df4db1ecd564645635d6c7fc182425cb501218fec485f5.css" integrity="sha256-aoPWLDmjZPA2302x7NVkZFY11sf8GCQly1ASGP7EhfU=">
+
+
+<link rel="stylesheet" href="/scss/print.2744dcbf8a0b2e74f8a50e4b34e5f441be7cf93cc7de27029121c6a09f9e77bc.css" integrity="sha256-J0Tcv4oLLnT4pQ5LNOX0Qb58&#43;TzH3icCkSHGoJ&#43;ed7w=" media="print">
+
+
+
+
+    
+<script type="application/javascript">
+var doNotTrack = false;
+if (!doNotTrack) {
+	(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+	(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+	m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+	})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+	ga('create', 'UA-172416417-1', 'auto');
+	
+	ga('send', 'pageview');
+}
+</script>
+
+    
+<script type="application/javascript">
+var doNotTrack = false;
+if (!doNotTrack) {
+	window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+	ga('create', 'UA-172416417-1', 'auto');
+	
+	ga('send', 'pageview');
+}
+</script>
+<script async src='https://www.google-analytics.com/analytics.js'></script>
+
+
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+    <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
+    <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+    <!-- Icons -->
+    <link rel="apple-touch-icon-precomposed" sizes="144x144" href="/apple-touch-icon-144-precomposed.png">
+    <link rel="shortcut icon" href="/favicon.png">
+    
+    
+
+</head>
+
+
+    <body class=" ">
+    
+<div class="sidebar">
+  <div class="container ">
+    <div class="sidebar-about">
+      <span class="site__title">
+        <a href="https://dylanmeeus.github.io">Dylan Meeus</a>
+      </span>
+      
+      
+        <div class="author-image">
+          <img src="https://www.gravatar.com/avatar/174fdce3b3920fc7b21aff714b0b664d?s=240&d=mp" class="img--circle img--headshot element--center" alt="gravatar">
+        </div>
+      
+      <p class="site__description">
+        
+      </p>
+    </div>
+    <div class="collapsible-menu">
+      <input type="checkbox" id="menuToggle">
+      <label for="menuToggle">Dylan Meeus</label>
+      <div class="menu-content">
+        <div>
+	<ul class="sidebar-nav">
+		 
+		
+	</ul>
+</div>
+
+        <section class="social">
+	
+	<a href="https://twitter.com/DylanMeeus" rel="me"><i class="fab fa-twitter fa-lg" aria-hidden="true"></i></a>
+	
+	
+	
+	<a href="https://github.com/DylanMeeus" rel="me"><i class="fab fa-github fa-lg" aria-hidden="true"></i></a>
+	
+	
+	
+	
+	
+	
+	
+	<a href="https://linkedin.com/in/dylanmeeus" rel="me"><i class="fab fa-linkedin fa-lg" aria-hidden="true"></i></a>
+	
+	
+	
+	
+	
+	
+	
+	
+	
+</section>
+
+      </div>
+    </div>
+    
+
+
+  </div>
+</div>
+
+        <div class="content container">
+            
+    
+<article>
+  <header>
+    <h1>Audio From Scratch With Go: ADSR</h1>
+    
+    
+<div class="post__meta">
+    
+    
+      <i class="fas fa-calendar-alt"></i> Sep 05, 2020
+    
+    
+    
+      
+      
+          in
+          
+          
+              <a class="badge badge-category" href="/categories/posts">POSTS</a>
+              
+          
+      
+    
+    
+    
+      
+      
+          <br/>
+           <i class="fas fa-tags"></i>
+          
+          <a class="badge badge-tag" href="/tags/audio">audio</a>
+           
+      
+          <a class="badge badge-tag" href="/tags/go">go</a>
+           
+      
+          <a class="badge badge-tag" href="/tags/goaudio">goaudio</a>
+          
+      
+    
+    
+    <br/>
+    <i class="fas fa-clock"></i> 4 min read
+</div>
+
+
+  </header>
+  
+  
+  <div class="post">
+    <p>With everything that we have added to our library so far we are almost capable of generated small
+tunes. One thing that&rsquo;s missing to make it sound more &lsquo;natural&rsquo; is a way for the notes to start and
+stop.</p>
+<p>In this post we will implement a type of envelope called &ldquo;ADSR&rdquo;, for &ldquo;Attack, Decay, Sustain,
+Release&rdquo;. Which will make the notes sound more natural as they are played in sequence.</p>
+<p>To see why we need this, listen to this sound generated without an ADSR envelope around the
+generated frames.</p>
+<ul>
+<li><a href="/audio/part10/no_adsr.wav">Without ADSR</a></li>
+<li><a href="/audio/part10/adsr.wav">With ADSR</a></li>
+</ul>
+<p>If you want to read the (not pretty) code that generated this, check out this <a href="https://gist.github.com/DylanMeeus/83f3ae5d628d11533b8fbd47298d8434">github
+gist</a>.</p>
+<h1 id="adsr">ADSR</h1>
+<p>The Attack, Decay, Sustain and Release envelope is a common type of envelope. Schematically this can
+be represented as below (from wikipedia):</p>
+<p><img src="/part10/adsrschema.png" alt="Wikipedia schematic of ADSR envelope"></p>
+<p>As we apply this envelope to a signal, the signal will change in amplitude depending on which phase
+we are in of the ADSR envelope. In the image it is visible that the amplitude rises during the
+attack step, reaches a peak amplitude before decreasing a bit. After decreasing it reached the
+sustain amplitude, where it will stay until the note is released, and after release it decays until
+the ampltide is zero.</p>
+<p>For our parameters, three will relate to time:</p>
+<ul>
+<li>attack (time to rise)</li>
+<li>decay (time to fall to sustain level)</li>
+<li>release (time to decay from sutan to zero)</li>
+</ul>
+<p>So the Sustain parameter does not refer to time, but rather to the amplitude we will maintain.</p>
+<p>Turning this schematic into code, we get :</p>
+<div class="highlight"><div style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4">
+<table style="border-spacing:0;padding:0;margin:0;border:0;width:auto;overflow:auto;display:block;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 2
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 3
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 4
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 5
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 6
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 7
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 8
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 9
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">10
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">11
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">12
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">13
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">14
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">15
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">16
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">17
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">18
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">19
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">20
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">21
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">22
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">23
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">24
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">25
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">26
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#66d9ef">func</span> <span style="color:#a6e22e">ADSR</span>(<span style="color:#a6e22e">maxamp</span>, <span style="color:#a6e22e">duration</span>, <span style="color:#a6e22e">attacktime</span>, <span style="color:#a6e22e">decaytime</span>, <span style="color:#a6e22e">sus</span>, <span style="color:#a6e22e">releasetime</span>, <span style="color:#a6e22e">controlrate</span> <span style="color:#66d9ef">float64</span>, <span style="color:#a6e22e">currentframe</span> <span style="color:#66d9ef">int</span>) <span style="color:#66d9ef">float64</span> {
+	<span style="color:#a6e22e">dur</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">duration</span> <span style="color:#f92672">*</span> <span style="color:#a6e22e">controlrate</span>
+	<span style="color:#a6e22e">at</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">attacktime</span> <span style="color:#f92672">*</span> <span style="color:#a6e22e">controlrate</span>
+	<span style="color:#a6e22e">dt</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">decaytime</span> <span style="color:#f92672">*</span> <span style="color:#a6e22e">controlrate</span>
+	<span style="color:#a6e22e">rt</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">releasetime</span> <span style="color:#f92672">*</span> <span style="color:#a6e22e">controlrate</span>
+	<span style="color:#a6e22e">cnt</span> <span style="color:#f92672">:=</span> float64(<span style="color:#a6e22e">currentframe</span>)
+
+	<span style="color:#a6e22e">amp</span> <span style="color:#f92672">:=</span> <span style="color:#ae81ff">0.0</span>
+	<span style="color:#66d9ef">if</span> <span style="color:#a6e22e">cnt</span> &lt; <span style="color:#a6e22e">dur</span> {
+		<span style="color:#66d9ef">if</span> <span style="color:#a6e22e">cnt</span> <span style="color:#f92672">&lt;=</span> <span style="color:#a6e22e">at</span> {
+			<span style="color:#75715e">// attack
+</span><span style="color:#75715e"></span>			<span style="color:#a6e22e">amp</span> = <span style="color:#a6e22e">cnt</span> <span style="color:#f92672">*</span> (<span style="color:#a6e22e">maxamp</span> <span style="color:#f92672">/</span> <span style="color:#a6e22e">at</span>)
+		} <span style="color:#66d9ef">else</span> <span style="color:#66d9ef">if</span> <span style="color:#a6e22e">cnt</span> <span style="color:#f92672">&lt;=</span> (<span style="color:#a6e22e">at</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">dt</span>) {
+			<span style="color:#75715e">// decay
+</span><span style="color:#75715e"></span>			<span style="color:#a6e22e">amp</span> = ((<span style="color:#a6e22e">sus</span><span style="color:#f92672">-</span><span style="color:#a6e22e">maxamp</span>)<span style="color:#f92672">/</span><span style="color:#a6e22e">dt</span>)<span style="color:#f92672">*</span>(<span style="color:#a6e22e">cnt</span><span style="color:#f92672">-</span><span style="color:#a6e22e">at</span>) <span style="color:#f92672">+</span> <span style="color:#a6e22e">maxamp</span>
+		} <span style="color:#66d9ef">else</span> <span style="color:#66d9ef">if</span> <span style="color:#a6e22e">cnt</span> <span style="color:#f92672">&lt;=</span> <span style="color:#a6e22e">dur</span><span style="color:#f92672">-</span><span style="color:#a6e22e">rt</span> {
+			<span style="color:#75715e">// sustain
+</span><span style="color:#75715e"></span>			<span style="color:#a6e22e">amp</span> = <span style="color:#a6e22e">sus</span>
+		} <span style="color:#66d9ef">else</span> <span style="color:#66d9ef">if</span> <span style="color:#a6e22e">cnt</span> &gt; (<span style="color:#a6e22e">dur</span> <span style="color:#f92672">-</span> <span style="color:#a6e22e">rt</span>) {
+			<span style="color:#75715e">// release
+</span><span style="color:#75715e"></span>			<span style="color:#a6e22e">amp</span> = <span style="color:#f92672">-</span>(<span style="color:#a6e22e">sus</span><span style="color:#f92672">/</span><span style="color:#a6e22e">rt</span>)<span style="color:#f92672">*</span>(<span style="color:#a6e22e">cnt</span><span style="color:#f92672">-</span>(<span style="color:#a6e22e">dur</span><span style="color:#f92672">-</span><span style="color:#a6e22e">rt</span>)) <span style="color:#f92672">+</span> <span style="color:#a6e22e">sus</span>
+		}
+	}
+
+	<span style="color:#66d9ef">return</span> <span style="color:#a6e22e">amp</span>
+}
+</code></pre></td></tr></table>
+</div>
+</div><p>One parameter in this function that you don&rsquo;t find in the schematic is the need for a control rate.
+The control rate will be used to turn a duration in seconds into an amount of frames. The control
+rate could just be sample rate but this does not necessarily have to be the case. One such use-case
+us sub-audio modulation, whereby the modulating oscillator is running below 20Hz. You can check
+<a href="https://cmtext.indiana.edu/synthesis/chapter4_modulation.php">this chapter</a> for a bit more on that.</p>
+<h1 id="application">Application</h1>
+<p>To apply the ADSR envelope to a signal, for example to one that was generating using the <a href="https://dylanmeeus.github.io/posts/audio-from-scratch-pt8.md">oscillator
+we created</a> we have to iterate over
+each frame, pass the current frame to the ADSR function, and modify the amplitude of the frame with
+the result. For example, this is the complete example program included in
+<a href="https://github.com/DylanMeeus/GoAudio/blob/master/examples/adsr/main.go">GoAudio</a>.</p>
+<div class="highlight"><div style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4">
+<table style="border-spacing:0;padding:0;margin:0;border:0;width:auto;overflow:auto;display:block;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 2
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 3
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 4
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 5
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 6
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 7
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 8
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 9
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">10
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">11
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">12
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">13
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">14
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">15
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">16
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">17
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">18
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">19
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">20
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">21
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">22
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">23
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">24
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">25
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">26
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">27
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">28
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">29
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">30
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">31
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">32
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#f92672">package</span> <span style="color:#a6e22e">main</span>
+
+<span style="color:#f92672">import</span> (
+	<span style="color:#e6db74">&#34;flag&#34;</span>
+	<span style="color:#e6db74">&#34;fmt&#34;</span>
+
+	<span style="color:#a6e22e">synth</span> <span style="color:#e6db74">&#34;github.com/DylanMeeus/GoAudio/synthesizer&#34;</span>
+	<span style="color:#e6db74">&#34;github.com/DylanMeeus/GoAudio/wave&#34;</span>
+)
+
+<span style="color:#66d9ef">func</span> <span style="color:#a6e22e">main</span>() {
+	<span style="color:#a6e22e">flag</span>.<span style="color:#a6e22e">Parse</span>()
+	<span style="color:#a6e22e">osc</span>, <span style="color:#a6e22e">err</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">synth</span>.<span style="color:#a6e22e">NewOscillator</span>(<span style="color:#ae81ff">44100</span>, <span style="color:#a6e22e">synth</span>.<span style="color:#a6e22e">SINE</span>)
+	<span style="color:#66d9ef">if</span> <span style="color:#a6e22e">err</span> <span style="color:#f92672">!=</span> <span style="color:#66d9ef">nil</span> {
+		panic(<span style="color:#a6e22e">err</span>)
+	}
+
+	<span style="color:#a6e22e">sr</span> <span style="color:#f92672">:=</span> <span style="color:#ae81ff">44100</span>
+	<span style="color:#a6e22e">duration</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">sr</span> <span style="color:#f92672">*</span> <span style="color:#ae81ff">10</span>
+
+	<span style="color:#a6e22e">frames</span> <span style="color:#f92672">:=</span> []<span style="color:#a6e22e">wave</span>.<span style="color:#a6e22e">Frame</span>{}
+	<span style="color:#66d9ef">var</span> <span style="color:#a6e22e">adsrtime</span> <span style="color:#66d9ef">int</span>
+	<span style="color:#66d9ef">for</span> <span style="color:#a6e22e">i</span> <span style="color:#f92672">:=</span> <span style="color:#ae81ff">0</span>; <span style="color:#a6e22e">i</span> &lt; <span style="color:#a6e22e">duration</span>; <span style="color:#a6e22e">i</span><span style="color:#f92672">++</span> {
+		<span style="color:#a6e22e">value</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">synth</span>.<span style="color:#a6e22e">ADSR</span>(<span style="color:#ae81ff">1</span>, <span style="color:#ae81ff">10</span>, <span style="color:#ae81ff">1</span>, <span style="color:#ae81ff">1</span>, <span style="color:#ae81ff">0.7</span>, <span style="color:#ae81ff">5</span>, float64(<span style="color:#a6e22e">sr</span>), <span style="color:#a6e22e">adsrtime</span>)
+		<span style="color:#a6e22e">adsrtime</span><span style="color:#f92672">++</span>
+		<span style="color:#a6e22e">frames</span> = append(<span style="color:#a6e22e">frames</span>, <span style="color:#a6e22e">wave</span>.<span style="color:#a6e22e">Frame</span>(<span style="color:#a6e22e">value</span><span style="color:#f92672">*</span><span style="color:#a6e22e">osc</span>.<span style="color:#a6e22e">Tick</span>(<span style="color:#ae81ff">440</span>)))
+	}
+
+	<span style="color:#a6e22e">wfmt</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">wave</span>.<span style="color:#a6e22e">NewWaveFmt</span>(<span style="color:#ae81ff">1</span>, <span style="color:#ae81ff">1</span>, <span style="color:#a6e22e">sr</span>, <span style="color:#ae81ff">16</span>, <span style="color:#66d9ef">nil</span>)
+	<span style="color:#a6e22e">wave</span>.<span style="color:#a6e22e">WriteFrames</span>(<span style="color:#a6e22e">frames</span>, <span style="color:#a6e22e">wfmt</span>, <span style="color:#e6db74">&#34;output.wav&#34;</span>)
+	<span style="color:#a6e22e">fmt</span>.<span style="color:#a6e22e">Println</span>(<span style="color:#e6db74">&#34;done writing to output.wav&#34;</span>)
+}
+</code></pre></td></tr></table>
+</div>
+</div><p>In this example, notice that our control rate is the same as our sample rate, and the adsrtime
+increases together with the frames that we have processed. (We could thus pass the <code>i</code> iterating
+variable to the function, but I thought making it explit was clearer).</p>
+<h1 id="resources">Resources</h1>
+<ul>
+<li><a href="https://github.com/DylanMeeus/GoAudio">GoAudio</a></li>
+<li><a href="https://github.com/DylanMeeus/GoAudio/blob/master/examples/adsr/main.go">ADSR example</a></li>
+</ul>
+<hr>
+<p>If you liked this and want to know when I write new posts, the best way to keep up to date is by <a href="https://twitter.com/DylanMeeus">following me on
+twitter</a>.</p>
+
+  </div>
+  
+
+<div class="navigation navigation-single">
+    
+    <a href="/posts/audio-from-scratch-pt9/" class="navigation-prev">
+      <i aria-hidden="true" class="fa fa-chevron-left"></i>
+      <span class="navigation-tittle">Audio From Scratch With Go: Waveform tables</span>
+    </a>
+    
+    
+</div>
+
+
+  
+
+  
+    
+
+
+</article>
+
+
+        </div>
+        
+    
+
+  
+  
+<script type="application/javascript">
+var doNotTrack = false;
+if (!doNotTrack) {
+	window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+	ga('create', 'UA-172416417-1', 'auto');
+	
+	ga('send', 'pageview');
+}
+</script>
+<script async src='https://www.google-analytics.com/analytics.js'></script>
+
+
+<script defer src="https://use.fontawesome.com/releases/v5.11.2/js/all.js" integrity="sha384-b3ua1l97aVGAPEIe48b4TC60WUQbQaGi2jqAWM90y0OZXZeyaTCWtBTKtjW2GXG1" crossorigin="anonymous"></script>
+
+
+
+
+    
+
+
+
+    </body>
+</html>
