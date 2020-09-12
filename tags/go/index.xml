@@ -6,10 +6,19 @@
     <description>Recent content in go on Dylan Meeus</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Sat, 05 Sep 2020 14:01:57 +0200</lastBuildDate>
+    <lastBuildDate>Sat, 12 Sep 2020 13:04:29 +0200</lastBuildDate>
     
 	<atom:link href="https://dylanmeeus.github.io/tags/go/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>Audio From Scratch With Go: Fourier Addition</title>
+      <link>https://dylanmeeus.github.io/posts/audio-from-scratch-pt11/</link>
+      <pubDate>Sat, 12 Sep 2020 13:04:29 +0200</pubDate>
+      
+      <guid>https://dylanmeeus.github.io/posts/audio-from-scratch-pt11/</guid>
+      <description>So far, we have seen how we can generate pure signals such as sine waves, square waves and triangle waves. These are handy signals for debugging and easy to generate, but in the real world instruments don&amp;rsquo;t generate such pure signals. For example, when plucking a guitar string it will vibrate along mutliple frequencies. These different vibrations are called the &amp;lsquo;harmonics&amp;rsquo;, which consist of the &amp;lsquo;fundamental&amp;rsquo; frequency + overtone frequencies. So the final sound that we hear is a combination of waves vibrating along these different frequencies.</description>
+    </item>
     
     <item>
       <title>Audio From Scratch With Go: ADSR</title>
