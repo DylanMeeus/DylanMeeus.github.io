@@ -12,7 +12,7 @@
     
     
     <item>
-      <title>Audio From Scratch With Go: Fourier Addition</title>
+      <title>Audio From Scratch With Go: Harmonics</title>
       <link>https://dylanmeeus.github.io/posts/audio-from-scratch-pt11/</link>
       <pubDate>Sat, 12 Sep 2020 13:04:29 +0200</pubDate>
       
@@ -21,7 +21,7 @@
     </item>
     
     <item>
-      <title>Audio From Scratch With Go: Harmonics</title>
+      <title>Audio From Scratch With Go: ADSR</title>
       <link>https://dylanmeeus.github.io/posts/audio-from-scratch-pt10/</link>
       <pubDate>Sat, 05 Sep 2020 14:01:57 +0200</pubDate>
       
