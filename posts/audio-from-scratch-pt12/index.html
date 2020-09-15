@@ -1,0 +1,580 @@
+<!DOCTYPE html>
+<html lang="en-us">
+    
+    
+
+
+    <head>
+    <link href="https://gmpg.org/xfn/11" rel="profile">
+    <meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta http-equiv="Cache-Control" content="public" />
+<!-- Enable responsiveness on mobile devices -->
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+<meta name="generator" content="Hugo 0.73.0" />
+
+    
+    
+    
+
+<title>Audio From Scratch With Go: Frere Jacques • Dylan Meeus</title>
+
+
+<meta name="twitter:card" content="summary_large_image"/>
+<meta name="twitter:image" content="https://dylanmeeus.github.io/audio/part12/audacity.png"/>
+
+<meta name="twitter:title" content="Audio From Scratch With Go: Frere Jacques"/>
+<meta name="twitter:description" content="In the last post I ended by saying we would be able to use GoAudio to generate some simple tunes. In this post we will actually put that to the test. Click the video to hear the end result :)
+  Frere Jacques When I was a kid, the first thing I was taught to play was the tune to &lsquo;Frere Jacques&rsquo; on my grandparents&rsquo; piano (to their dismay, also the last thing I actually learned to play until I picked up a guitar 15 years later and played that badly)."/>
+<meta name="twitter:site" content="@DylanMeeus"/>
+
+<meta property="og:title" content="Audio From Scratch With Go: Frere Jacques" />
+<meta property="og:description" content="In the last post I ended by saying we would be able to use GoAudio to generate some simple tunes. In this post we will actually put that to the test. Click the video to hear the end result :)
+  Frere Jacques When I was a kid, the first thing I was taught to play was the tune to &lsquo;Frere Jacques&rsquo; on my grandparents&rsquo; piano (to their dismay, also the last thing I actually learned to play until I picked up a guitar 15 years later and played that badly)." />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://dylanmeeus.github.io/posts/audio-from-scratch-pt12/" />
+<meta property="og:image" content="https://dylanmeeus.github.io/audio/part12/audacity.png" />
+<meta property="article:published_time" content="2020-09-13T16:27:35+02:00" />
+<meta property="article:modified_time" content="2020-09-13T16:27:35+02:00" />
+
+
+    
+
+
+
+
+
+
+<link rel="stylesheet" href="/scss/hyde-hyde.6a83d62c39a364f036df4db1ecd564645635d6c7fc182425cb501218fec485f5.css" integrity="sha256-aoPWLDmjZPA2302x7NVkZFY11sf8GCQly1ASGP7EhfU=">
+
+
+<link rel="stylesheet" href="/scss/print.2744dcbf8a0b2e74f8a50e4b34e5f441be7cf93cc7de27029121c6a09f9e77bc.css" integrity="sha256-J0Tcv4oLLnT4pQ5LNOX0Qb58&#43;TzH3icCkSHGoJ&#43;ed7w=" media="print">
+
+
+
+
+    
+<script type="application/javascript">
+var doNotTrack = false;
+if (!doNotTrack) {
+	(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+	(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+	m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+	})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+	ga('create', 'UA-172416417-1', 'auto');
+	
+	ga('send', 'pageview');
+}
+</script>
+
+    
+<script type="application/javascript">
+var doNotTrack = false;
+if (!doNotTrack) {
+	window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+	ga('create', 'UA-172416417-1', 'auto');
+	
+	ga('send', 'pageview');
+}
+</script>
+<script async src='https://www.google-analytics.com/analytics.js'></script>
+
+
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+    <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
+    <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+    <!-- Icons -->
+    <link rel="apple-touch-icon-precomposed" sizes="144x144" href="/apple-touch-icon-144-precomposed.png">
+    <link rel="shortcut icon" href="/favicon.png">
+    
+    
+
+</head>
+
+
+    <body class=" ">
+    
+<div class="sidebar">
+  <div class="container ">
+    <div class="sidebar-about">
+      <span class="site__title">
+        <a href="https://dylanmeeus.github.io">Dylan Meeus</a>
+      </span>
+      
+      
+        <div class="author-image">
+          <img src="https://www.gravatar.com/avatar/174fdce3b3920fc7b21aff714b0b664d?s=240&d=mp" class="img--circle img--headshot element--center" alt="gravatar">
+        </div>
+      
+      <p class="site__description">
+        
+      </p>
+    </div>
+    <div class="collapsible-menu">
+      <input type="checkbox" id="menuToggle">
+      <label for="menuToggle">Dylan Meeus</label>
+      <div class="menu-content">
+        <div>
+	<ul class="sidebar-nav">
+		 
+		
+	</ul>
+</div>
+
+        <section class="social">
+	
+	<a href="https://twitter.com/DylanMeeus" rel="me"><i class="fab fa-twitter fa-lg" aria-hidden="true"></i></a>
+	
+	
+	
+	<a href="https://github.com/DylanMeeus" rel="me"><i class="fab fa-github fa-lg" aria-hidden="true"></i></a>
+	
+	
+	
+	
+	
+	
+	
+	<a href="https://linkedin.com/in/dylanmeeus" rel="me"><i class="fab fa-linkedin fa-lg" aria-hidden="true"></i></a>
+	
+	
+	
+	
+	
+	
+	
+	
+	
+</section>
+
+      </div>
+    </div>
+    
+
+
+  </div>
+</div>
+
+        <div class="content container">
+            
+    
+<article>
+  <header>
+    <h1>Audio From Scratch With Go: Frere Jacques</h1>
+    
+    
+<div class="post__meta">
+    
+    
+      <i class="fas fa-calendar-alt"></i> Sep 13, 2020
+    
+    
+    
+      
+      
+          in
+          
+          
+              <a class="badge badge-category" href="/categories/posts">POSTS</a>
+              
+          
+      
+    
+    
+    
+      
+      
+          <br/>
+           <i class="fas fa-tags"></i>
+          
+          <a class="badge badge-tag" href="/tags/audio">audio</a>
+           
+      
+          <a class="badge badge-tag" href="/tags/go">go</a>
+           
+      
+          <a class="badge badge-tag" href="/tags/goaudio">goaudio</a>
+          
+      
+    
+    
+    <br/>
+    <i class="fas fa-clock"></i> 7 min read
+</div>
+
+
+  </header>
+  
+  
+  <div class="post">
+    <p>In the <a href="https://dylanmeeus.github.io/posts/audio-from-scratch-pt11">last post</a> I ended by saying we
+would be able to use <a href="https://github.com/DylanMeeus/GoAudio">GoAudio</a> to generate some simple tunes.
+In this post we will actually put that to the test. Click the video to hear the end result :)</p>
+
+<div style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden;">
+  <iframe src="https://player.vimeo.com/video/458251843" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border:0;" title="vimeo video" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe>
+ </div>
+
+<h2 id="frere-jacques">Frere Jacques</h2>
+<p>When I was a kid, the first thing I was taught to play was the tune to &lsquo;Frere Jacques&rsquo; on my grandparents&rsquo; piano (to their dismay,
+also the last thing I actually learned to play until I picked up a guitar 15 years later and played that badly). As such, I thought it&rsquo;d be fitting to try to code
+this song this time. The notes for playing this are taken from <a href="https://www.true-piano-lessons.com/frere-jacques.html">true-piano-lessons.com</a>. The code takes the notes starting in the key of C. (Maybe since it&rsquo;s in Go, I should have started
+in G. Feel free to change it).</p>
+<h2 id="generating-notes">Generating notes</h2>
+<p>In the previous posts, we actually ignored the problem of turning notes into frequencies.
+<a href="https://github.com/DylanMeeus/GoAudio">GoAudio</a> works with given frequencies. So we&rsquo;ll need to
+first implement a way to turn the notes into frequencies. For this, I came up with a somewhat
+hackish solution but I didn&rsquo;t know a better way other than hardcoding it.</p>
+<p>As we&rsquo;re making the music using the equal-tempered scale we can calculate the frequencies for each
+note given a reference frequency. I&rsquo;m using <code>middle C</code> as the reference frequency, which can be
+derived from <code>concert A (A440</code>) in this way: <code>middleC = (concertA * math.Pow(2, 3/12)) / 2</code>.</p>
+<p>To follow along with how we derive the frequencies for each note, I suggest taking a look at
+<a href="https://en.wikipedia.org/wiki/Equal_temperament">wikipedia</a>. The basic idea however is that we have
+12 semitones in an octave, so for each octave we have to generate the 12 semitones based off a
+reference frequency. Confusingly however, an octave starts at <code>C</code> and not at <code>A</code>. (it does loop
+around) so we get: <code>C D E F G A B</code>. Each time we loop around and get back to C, we move up one
+octave (meaning higher frequency, thus higher pitch).</p>
+<p>You can view a table of all frequencies from C0 (C at octave 0) up to B8 (B at octave 8)
+<a href="https://pages.mtu.edu/~suits/notefreqs.html">here</a>.</p>
+<p>The code for this is a bit hacky, so if you have a better way please let me know! :-)</p>
+<div class="highlight"><div style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4">
+<table style="border-spacing:0;padding:0;margin:0;border:0;width:auto;overflow:auto;display:block;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 2
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 3
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 4
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 5
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 6
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 7
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 8
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 9
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">10
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">11
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">12
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">13
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">14
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">15
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">16
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">17
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">18
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">19
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">20
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">21
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">22
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">23
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">24
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">25
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">26
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#66d9ef">var</span> (
+	<span style="color:#a6e22e">notes</span> = []<span style="color:#66d9ef">string</span>{<span style="color:#e6db74">&#34;C&#34;</span>, <span style="color:#e6db74">&#34;C#&#34;</span>, <span style="color:#e6db74">&#34;D&#34;</span>, <span style="color:#e6db74">&#34;D#&#34;</span>, <span style="color:#e6db74">&#34;E&#34;</span>, <span style="color:#e6db74">&#34;F&#34;</span>, <span style="color:#e6db74">&#34;F#&#34;</span>, <span style="color:#e6db74">&#34;G&#34;</span>, <span style="color:#e6db74">&#34;G#&#34;</span>, <span style="color:#e6db74">&#34;A&#34;</span>, <span style="color:#e6db74">&#34;A#&#34;</span>, <span style="color:#e6db74">&#34;B&#34;</span>}
+)
+
+<span style="color:#75715e">// GenerateNotes creates the &lt;note,frequency&gt; map based on reference frequency FR.
+</span><span style="color:#75715e">// The reference frequency is set to 440
+</span><span style="color:#75715e"></span><span style="color:#66d9ef">func</span> <span style="color:#a6e22e">generateNotes</span>() <span style="color:#66d9ef">map</span>[<span style="color:#66d9ef">string</span>]<span style="color:#66d9ef">float64</span> {
+	<span style="color:#a6e22e">ni</span> <span style="color:#f92672">:=</span> <span style="color:#ae81ff">0</span>
+	<span style="color:#a6e22e">concertA</span> <span style="color:#f92672">:=</span> <span style="color:#ae81ff">440.</span>
+	<span style="color:#a6e22e">middleC</span> <span style="color:#f92672">:=</span> (<span style="color:#a6e22e">concertA</span> <span style="color:#f92672">*</span> <span style="color:#a6e22e">math</span>.<span style="color:#a6e22e">Pow</span>(<span style="color:#ae81ff">2</span>, <span style="color:#ae81ff">3.</span><span style="color:#f92672">/</span><span style="color:#ae81ff">12.</span>)) <span style="color:#f92672">/</span> <span style="color:#ae81ff">2.</span>
+	<span style="color:#a6e22e">FR</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">middleC</span>
+	<span style="color:#a6e22e">notemap</span> <span style="color:#f92672">:=</span> <span style="color:#66d9ef">map</span>[<span style="color:#66d9ef">string</span>]<span style="color:#66d9ef">float64</span>{}
+	<span style="color:#66d9ef">for</span> <span style="color:#a6e22e">i</span> <span style="color:#f92672">:=</span> <span style="color:#ae81ff">0</span>; <span style="color:#a6e22e">i</span> &lt; <span style="color:#ae81ff">24</span>; <span style="color:#a6e22e">i</span><span style="color:#f92672">++</span> {
+		<span style="color:#a6e22e">FK</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">FR</span> <span style="color:#f92672">*</span> <span style="color:#a6e22e">math</span>.<span style="color:#a6e22e">Pow</span>(<span style="color:#ae81ff">2</span>, float64(<span style="color:#a6e22e">i</span>)<span style="color:#f92672">/</span><span style="color:#ae81ff">12.</span>)
+		<span style="color:#a6e22e">note</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">notes</span>[<span style="color:#a6e22e">ni</span><span style="color:#f92672">%</span>len(<span style="color:#a6e22e">notes</span>)]
+		<span style="color:#a6e22e">octave</span> <span style="color:#f92672">:=</span> <span style="color:#ae81ff">4</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">i</span><span style="color:#f92672">/</span><span style="color:#ae81ff">12</span>
+		<span style="color:#66d9ef">var</span> <span style="color:#a6e22e">octs</span> <span style="color:#66d9ef">string</span>
+		<span style="color:#66d9ef">if</span> <span style="color:#a6e22e">octave</span> <span style="color:#f92672">!=</span> <span style="color:#ae81ff">0</span> {
+			<span style="color:#a6e22e">octs</span> = <span style="color:#a6e22e">strconv</span>.<span style="color:#a6e22e">Itoa</span>(<span style="color:#a6e22e">octave</span>)
+		}
+		<span style="color:#a6e22e">notemap</span>[<span style="color:#a6e22e">note</span><span style="color:#f92672">+</span><span style="color:#a6e22e">octs</span>] = <span style="color:#a6e22e">FK</span>
+		<span style="color:#a6e22e">ni</span><span style="color:#f92672">++</span>
+	}
+	<span style="color:#a6e22e">notemap</span>[<span style="color:#e6db74">&#34;WAIT&#34;</span>] = <span style="color:#ae81ff">0.</span>
+	<span style="color:#66d9ef">return</span> <span style="color:#a6e22e">notemap</span>
+}
+</code></pre></td></tr></table>
+</div>
+</div><p>Here I am generating in both the fourth and fifth octave, from C4 -&gt; B5. If we print the map
+generated by this code we get (abbreviated)</p>
+<pre><code>map[A#4:466.1637615180899 
+A#5:932.3275230361797 
+A4:439.99999999999994 
+A5:879.9999999999999
+B4:493.8833012561241 
+B5:987.7666025122483 
+C#4:277.1826309768721 
+C#5:554.3652619537442
+...
+WAIT:0
+]
+</code></pre><p>Also note that I have added <code>WAIT</code> with frequency 0 in there. This is a bit hacky (and unnecessary
+in Go). I&rsquo;ve added this so we can have some more wait time between playing different sections of the song.
+As the default-zero value of a float is zero, and because you can access a map safely even when a
+key is missing, this was not necessary. We could just call the map with the <code>WAIT</code> key even if it
+wasn&rsquo;t inserted and our result would still be correct.</p>
+<div class="highlight"><div style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4">
+<table style="border-spacing:0;padding:0;margin:0;border:0;width:auto;overflow:auto;display:block;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">4
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#a6e22e">x</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">notemap</span>[<span style="color:#e6db74">&#34;WAIT&#34;</span>]
+<span style="color:#75715e">// = 0
+</span><span style="color:#75715e"></span><span style="color:#a6e22e">y</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">notemap</span>[<span style="color:#e6db74">&#34;STOP_HAMMERTIME&#34;</span>]
+<span style="color:#75715e">// y = 0
+</span></code></pre></td></tr></table>
+</div>
+</div><p>If you&rsquo;re reading this, there&rsquo;s a pretty good chance you know this. But I wanted to highlight it, as
+I think this is a pretty cool feature of Go! Yet, in this case, I chose to be explicit about the
+intend of the <code>WAIT</code> note.</p>
+<h3 id="playing-a-note">Playing a note</h3>
+<p>Alright, so we have our notes and our frequencies associated with them. We still need to actually
+generate a wave. For this I&rsquo;ve introduced the convenience function &ldquo;play&rdquo; which takes a few
+parameters and returns a frame:</p>
+<pre><code>play(LookupOscillator, Note, Duration, Notefreqs) -&gt; []Frame
+</code></pre><p>This is quite similar to the past about
+<a href="https://dylanmeeus.github.io.posts/audio-from-scratch-pt10.md">ADSR</a>, and just as in that post we
+will apply the ADSR envelope to the signal here as well. Notice that &lsquo;play&rsquo; takes a <code>LookupOscillator</code>.
+In the previous post we&rsquo;ve build a few of these for generating sine waves, triangle, square, etc.</p>
+<p>This function tells us, play a note for a certain duration (in seconds) with a given oscillator, and
+return a slice of frames. This function allowed me to quickly change the type of wave, and play
+around with the result of playing different notes for different timespans.</p>
+<div class="highlight"><div style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4">
+<table style="border-spacing:0;padding:0;margin:0;border:0;width:auto;overflow:auto;display:block;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 2
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 3
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 4
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 5
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 6
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 7
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 8
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 9
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">10
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">11
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">12
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">13
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#66d9ef">func</span> <span style="color:#a6e22e">play</span>(<span style="color:#a6e22e">l</span> <span style="color:#f92672">*</span><span style="color:#a6e22e">synth</span>.<span style="color:#a6e22e">LookupOscillator</span>, <span style="color:#a6e22e">note</span> <span style="color:#66d9ef">string</span>, <span style="color:#a6e22e">duration</span> <span style="color:#66d9ef">float64</span>, <span style="color:#a6e22e">notefreqs</span> <span style="color:#66d9ef">map</span>[<span style="color:#66d9ef">string</span>]<span style="color:#66d9ef">float64</span>) []<span style="color:#a6e22e">wave</span>.<span style="color:#a6e22e">Frame</span> {
+	<span style="color:#a6e22e">freq</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">notefreqs</span>[<span style="color:#a6e22e">note</span>]
+
+	<span style="color:#a6e22e">frames</span> <span style="color:#f92672">:=</span> make([]<span style="color:#a6e22e">wave</span>.<span style="color:#a6e22e">Frame</span>, int(<span style="color:#a6e22e">duration</span><span style="color:#f92672">*</span><span style="color:#a6e22e">sr</span>))
+	<span style="color:#66d9ef">var</span> <span style="color:#a6e22e">adsrtime</span> <span style="color:#66d9ef">int</span>
+	<span style="color:#66d9ef">for</span> <span style="color:#a6e22e">i</span> <span style="color:#f92672">:=</span> <span style="color:#66d9ef">range</span> <span style="color:#a6e22e">frames</span> {
+		<span style="color:#a6e22e">value</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">synth</span>.<span style="color:#a6e22e">ADSR</span>(<span style="color:#ae81ff">0.8</span>, <span style="color:#a6e22e">duration</span>, <span style="color:#ae81ff">0.2</span>, <span style="color:#ae81ff">0.1</span>, <span style="color:#ae81ff">0.5</span>, <span style="color:#a6e22e">duration</span><span style="color:#f92672">-</span><span style="color:#ae81ff">0.05</span>, <span style="color:#a6e22e">sr</span>, <span style="color:#a6e22e">adsrtime</span>)
+		<span style="color:#a6e22e">adsrtime</span><span style="color:#f92672">++</span>
+		<span style="color:#a6e22e">frames</span>[<span style="color:#a6e22e">i</span>] = <span style="color:#a6e22e">wave</span>.<span style="color:#a6e22e">Frame</span>(<span style="color:#a6e22e">value</span> <span style="color:#f92672">*</span> <span style="color:#a6e22e">l</span>.<span style="color:#a6e22e">InterpolateTick</span>(<span style="color:#a6e22e">freq</span>))
+	}
+
+	<span style="color:#66d9ef">return</span> <span style="color:#a6e22e">frames</span>
+}
+</code></pre></td></tr></table>
+</div>
+</div><p>Getting the ADSR envelope to sound like I wanted to was honestly the goold old way of trial and error. 😅.</p>
+<h3 id="composing-the-song">Composing the song</h3>
+<p>Finally we have everything ready to compose the song. The below code is definitely not pretty, but it gets the job done!
+First we generate the notes, then we create a wave table of a shape that we&rsquo;d like. We
+plug this into an Oscillator, and then we start calling the <code>Play</code> function with the notes that we
+need.</p>
+<p>For convenience I&rsquo;ve added some variables to easily adapt the duration of sections of the song.
+Variables, yeah!</p>
+<div class="highlight"><div style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4">
+<table style="border-spacing:0;padding:0;margin:0;border:0;width:auto;overflow:auto;display:block;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 2
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 3
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 4
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 5
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 6
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 7
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 8
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 9
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">10
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">11
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">12
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">13
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">14
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">15
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">16
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">17
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">18
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">19
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">20
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">21
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">22
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">23
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">24
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">25
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">26
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">27
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">28
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">29
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">30
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">31
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">32
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">33
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">34
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">35
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">36
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">37
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">38
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">39
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">40
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">41
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">42
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">43
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">44
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">45
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">46
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">47
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">48
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">49
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">50
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">51
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">52
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">53
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">54
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">55
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">56
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">57
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">58
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">59
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">60
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">61
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">62
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">63
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">64
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#66d9ef">func</span> <span style="color:#a6e22e">main</span>() {
+	<span style="color:#a6e22e">nm</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">generateNotes</span>()
+	<span style="color:#a6e22e">st</span>, <span style="color:#a6e22e">err</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">synth</span>.<span style="color:#a6e22e">NewTriangleTable</span>(<span style="color:#ae81ff">8</span><span style="color:#f92672">*</span><span style="color:#ae81ff">1024</span>, <span style="color:#ae81ff">11</span>)
+	<span style="color:#66d9ef">if</span> <span style="color:#a6e22e">err</span> <span style="color:#f92672">!=</span> <span style="color:#66d9ef">nil</span> {
+		panic(<span style="color:#a6e22e">err</span>)
+	}
+	<span style="color:#a6e22e">osc</span>, <span style="color:#a6e22e">err</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">synth</span>.<span style="color:#a6e22e">NewLookupOscillator</span>(<span style="color:#a6e22e">sr</span>, <span style="color:#a6e22e">st</span>, <span style="color:#ae81ff">0</span>)
+	<span style="color:#66d9ef">if</span> <span style="color:#a6e22e">err</span> <span style="color:#f92672">!=</span> <span style="color:#66d9ef">nil</span> {
+		panic(<span style="color:#a6e22e">err</span>)
+	}
+
+	<span style="color:#a6e22e">waitdur</span> <span style="color:#f92672">:=</span> <span style="color:#ae81ff">.1</span>
+	<span style="color:#a6e22e">cdecdur</span> <span style="color:#f92672">:=</span> <span style="color:#ae81ff">0.6</span>
+	<span style="color:#a6e22e">efgdur</span> <span style="color:#f92672">:=</span> <span style="color:#ae81ff">0.6</span>
+	<span style="color:#a6e22e">gagfecdur</span> <span style="color:#f92672">:=</span> <span style="color:#ae81ff">0.5</span>
+	<span style="color:#a6e22e">cgcdur</span> <span style="color:#f92672">:=</span> <span style="color:#ae81ff">0.5</span>
+
+	<span style="color:#75715e">// notes: https://www.true-piano-lessons.com/frere-jacques.html
+</span><span style="color:#75715e"></span>	<span style="color:#a6e22e">output</span> <span style="color:#f92672">:=</span> []<span style="color:#a6e22e">wave</span>.<span style="color:#a6e22e">Frame</span>{}
+	<span style="color:#75715e">// frere jacues
+</span><span style="color:#75715e"></span>	<span style="color:#a6e22e">output</span> = append(<span style="color:#a6e22e">output</span>, <span style="color:#a6e22e">play</span>(<span style="color:#a6e22e">osc</span>, <span style="color:#e6db74">&#34;C5&#34;</span>, <span style="color:#a6e22e">cdecdur</span>, <span style="color:#a6e22e">nm</span>)<span style="color:#f92672">...</span>)
+	<span style="color:#a6e22e">output</span> = append(<span style="color:#a6e22e">output</span>, <span style="color:#a6e22e">play</span>(<span style="color:#a6e22e">osc</span>, <span style="color:#e6db74">&#34;D5&#34;</span>, <span style="color:#a6e22e">cdecdur</span>, <span style="color:#a6e22e">nm</span>)<span style="color:#f92672">...</span>)
+	<span style="color:#a6e22e">output</span> = append(<span style="color:#a6e22e">output</span>, <span style="color:#a6e22e">play</span>(<span style="color:#a6e22e">osc</span>, <span style="color:#e6db74">&#34;E5&#34;</span>, <span style="color:#a6e22e">cdecdur</span>, <span style="color:#a6e22e">nm</span>)<span style="color:#f92672">...</span>)
+	<span style="color:#a6e22e">output</span> = append(<span style="color:#a6e22e">output</span>, <span style="color:#a6e22e">play</span>(<span style="color:#a6e22e">osc</span>, <span style="color:#e6db74">&#34;C5&#34;</span>, <span style="color:#a6e22e">cdecdur</span>, <span style="color:#a6e22e">nm</span>)<span style="color:#f92672">...</span>)
+	<span style="color:#a6e22e">output</span> = append(<span style="color:#a6e22e">output</span>, <span style="color:#a6e22e">play</span>(<span style="color:#a6e22e">osc</span>, <span style="color:#e6db74">&#34;C5&#34;</span>, <span style="color:#a6e22e">cdecdur</span>, <span style="color:#a6e22e">nm</span>)<span style="color:#f92672">...</span>)
+	<span style="color:#a6e22e">output</span> = append(<span style="color:#a6e22e">output</span>, <span style="color:#a6e22e">play</span>(<span style="color:#a6e22e">osc</span>, <span style="color:#e6db74">&#34;D5&#34;</span>, <span style="color:#a6e22e">cdecdur</span>, <span style="color:#a6e22e">nm</span>)<span style="color:#f92672">...</span>)
+	<span style="color:#a6e22e">output</span> = append(<span style="color:#a6e22e">output</span>, <span style="color:#a6e22e">play</span>(<span style="color:#a6e22e">osc</span>, <span style="color:#e6db74">&#34;E5&#34;</span>, <span style="color:#a6e22e">cdecdur</span>, <span style="color:#a6e22e">nm</span>)<span style="color:#f92672">...</span>)
+	<span style="color:#a6e22e">output</span> = append(<span style="color:#a6e22e">output</span>, <span style="color:#a6e22e">play</span>(<span style="color:#a6e22e">osc</span>, <span style="color:#e6db74">&#34;C5&#34;</span>, <span style="color:#a6e22e">cdecdur</span>, <span style="color:#a6e22e">nm</span>)<span style="color:#f92672">...</span>)
+	<span style="color:#a6e22e">output</span> = append(<span style="color:#a6e22e">output</span>, <span style="color:#a6e22e">play</span>(<span style="color:#a6e22e">osc</span>, <span style="color:#e6db74">&#34;WAIT&#34;</span>, <span style="color:#a6e22e">waitdur</span>, <span style="color:#a6e22e">nm</span>)<span style="color:#f92672">...</span>)
+	<span style="color:#75715e">// dormez-vous
+</span><span style="color:#75715e"></span>	<span style="color:#a6e22e">output</span> = append(<span style="color:#a6e22e">output</span>, <span style="color:#a6e22e">play</span>(<span style="color:#a6e22e">osc</span>, <span style="color:#e6db74">&#34;E5&#34;</span>, <span style="color:#a6e22e">efgdur</span>, <span style="color:#a6e22e">nm</span>)<span style="color:#f92672">...</span>)
+	<span style="color:#a6e22e">output</span> = append(<span style="color:#a6e22e">output</span>, <span style="color:#a6e22e">play</span>(<span style="color:#a6e22e">osc</span>, <span style="color:#e6db74">&#34;F5&#34;</span>, <span style="color:#a6e22e">efgdur</span>, <span style="color:#a6e22e">nm</span>)<span style="color:#f92672">...</span>)
+	<span style="color:#a6e22e">output</span> = append(<span style="color:#a6e22e">output</span>, <span style="color:#a6e22e">play</span>(<span style="color:#a6e22e">osc</span>, <span style="color:#e6db74">&#34;G5&#34;</span>, <span style="color:#a6e22e">efgdur</span>, <span style="color:#a6e22e">nm</span>)<span style="color:#f92672">...</span>)
+	<span style="color:#a6e22e">output</span> = append(<span style="color:#a6e22e">output</span>, <span style="color:#a6e22e">play</span>(<span style="color:#a6e22e">osc</span>, <span style="color:#e6db74">&#34;WAIT&#34;</span>, <span style="color:#ae81ff">0.2</span>, <span style="color:#a6e22e">nm</span>)<span style="color:#f92672">...</span>)
+	<span style="color:#a6e22e">output</span> = append(<span style="color:#a6e22e">output</span>, <span style="color:#a6e22e">play</span>(<span style="color:#a6e22e">osc</span>, <span style="color:#e6db74">&#34;E5&#34;</span>, <span style="color:#a6e22e">efgdur</span>, <span style="color:#a6e22e">nm</span>)<span style="color:#f92672">...</span>)
+	<span style="color:#a6e22e">output</span> = append(<span style="color:#a6e22e">output</span>, <span style="color:#a6e22e">play</span>(<span style="color:#a6e22e">osc</span>, <span style="color:#e6db74">&#34;F5&#34;</span>, <span style="color:#a6e22e">efgdur</span>, <span style="color:#a6e22e">nm</span>)<span style="color:#f92672">...</span>)
+	<span style="color:#a6e22e">output</span> = append(<span style="color:#a6e22e">output</span>, <span style="color:#a6e22e">play</span>(<span style="color:#a6e22e">osc</span>, <span style="color:#e6db74">&#34;G5&#34;</span>, <span style="color:#a6e22e">efgdur</span>, <span style="color:#a6e22e">nm</span>)<span style="color:#f92672">...</span>)
+	<span style="color:#75715e">// sonnez les matines
+</span><span style="color:#75715e"></span>	<span style="color:#a6e22e">output</span> = append(<span style="color:#a6e22e">output</span>, <span style="color:#a6e22e">play</span>(<span style="color:#a6e22e">osc</span>, <span style="color:#e6db74">&#34;G5&#34;</span>, <span style="color:#a6e22e">gagfecdur</span>, <span style="color:#a6e22e">nm</span>)<span style="color:#f92672">...</span>)
+	<span style="color:#a6e22e">output</span> = append(<span style="color:#a6e22e">output</span>, <span style="color:#a6e22e">play</span>(<span style="color:#a6e22e">osc</span>, <span style="color:#e6db74">&#34;A5&#34;</span>, <span style="color:#a6e22e">gagfecdur</span>, <span style="color:#a6e22e">nm</span>)<span style="color:#f92672">...</span>)
+	<span style="color:#a6e22e">output</span> = append(<span style="color:#a6e22e">output</span>, <span style="color:#a6e22e">play</span>(<span style="color:#a6e22e">osc</span>, <span style="color:#e6db74">&#34;G5&#34;</span>, <span style="color:#a6e22e">gagfecdur</span>, <span style="color:#a6e22e">nm</span>)<span style="color:#f92672">...</span>)
+	<span style="color:#a6e22e">output</span> = append(<span style="color:#a6e22e">output</span>, <span style="color:#a6e22e">play</span>(<span style="color:#a6e22e">osc</span>, <span style="color:#e6db74">&#34;F5&#34;</span>, <span style="color:#a6e22e">gagfecdur</span>, <span style="color:#a6e22e">nm</span>)<span style="color:#f92672">...</span>)
+	<span style="color:#a6e22e">output</span> = append(<span style="color:#a6e22e">output</span>, <span style="color:#a6e22e">play</span>(<span style="color:#a6e22e">osc</span>, <span style="color:#e6db74">&#34;E5&#34;</span>, <span style="color:#a6e22e">gagfecdur</span>, <span style="color:#a6e22e">nm</span>)<span style="color:#f92672">...</span>)
+	<span style="color:#a6e22e">output</span> = append(<span style="color:#a6e22e">output</span>, <span style="color:#a6e22e">play</span>(<span style="color:#a6e22e">osc</span>, <span style="color:#e6db74">&#34;C5&#34;</span>, <span style="color:#a6e22e">gagfecdur</span>, <span style="color:#a6e22e">nm</span>)<span style="color:#f92672">...</span>)
+	<span style="color:#a6e22e">output</span> = append(<span style="color:#a6e22e">output</span>, <span style="color:#a6e22e">play</span>(<span style="color:#a6e22e">osc</span>, <span style="color:#e6db74">&#34;WAIT&#34;</span>, <span style="color:#ae81ff">0.2</span>, <span style="color:#a6e22e">nm</span>)<span style="color:#f92672">...</span>)
+	<span style="color:#a6e22e">output</span> = append(<span style="color:#a6e22e">output</span>, <span style="color:#a6e22e">play</span>(<span style="color:#a6e22e">osc</span>, <span style="color:#e6db74">&#34;G5&#34;</span>, <span style="color:#a6e22e">gagfecdur</span>, <span style="color:#a6e22e">nm</span>)<span style="color:#f92672">...</span>)
+	<span style="color:#a6e22e">output</span> = append(<span style="color:#a6e22e">output</span>, <span style="color:#a6e22e">play</span>(<span style="color:#a6e22e">osc</span>, <span style="color:#e6db74">&#34;A5&#34;</span>, <span style="color:#a6e22e">gagfecdur</span>, <span style="color:#a6e22e">nm</span>)<span style="color:#f92672">...</span>)
+	<span style="color:#a6e22e">output</span> = append(<span style="color:#a6e22e">output</span>, <span style="color:#a6e22e">play</span>(<span style="color:#a6e22e">osc</span>, <span style="color:#e6db74">&#34;G5&#34;</span>, <span style="color:#a6e22e">gagfecdur</span>, <span style="color:#a6e22e">nm</span>)<span style="color:#f92672">...</span>)
+	<span style="color:#a6e22e">output</span> = append(<span style="color:#a6e22e">output</span>, <span style="color:#a6e22e">play</span>(<span style="color:#a6e22e">osc</span>, <span style="color:#e6db74">&#34;F5&#34;</span>, <span style="color:#a6e22e">gagfecdur</span>, <span style="color:#a6e22e">nm</span>)<span style="color:#f92672">...</span>)
+	<span style="color:#a6e22e">output</span> = append(<span style="color:#a6e22e">output</span>, <span style="color:#a6e22e">play</span>(<span style="color:#a6e22e">osc</span>, <span style="color:#e6db74">&#34;E5&#34;</span>, <span style="color:#a6e22e">gagfecdur</span>, <span style="color:#a6e22e">nm</span>)<span style="color:#f92672">...</span>)
+	<span style="color:#a6e22e">output</span> = append(<span style="color:#a6e22e">output</span>, <span style="color:#a6e22e">play</span>(<span style="color:#a6e22e">osc</span>, <span style="color:#e6db74">&#34;C5&#34;</span>, <span style="color:#a6e22e">gagfecdur</span>, <span style="color:#a6e22e">nm</span>)<span style="color:#f92672">...</span>)
+	<span style="color:#a6e22e">output</span> = append(<span style="color:#a6e22e">output</span>, <span style="color:#a6e22e">play</span>(<span style="color:#a6e22e">osc</span>, <span style="color:#e6db74">&#34;WAIT&#34;</span>, <span style="color:#a6e22e">gagfecdur</span>, <span style="color:#a6e22e">nm</span>)<span style="color:#f92672">...</span>)
+	<span style="color:#75715e">// dindindon
+</span><span style="color:#75715e"></span>	<span style="color:#a6e22e">output</span> = append(<span style="color:#a6e22e">output</span>, <span style="color:#a6e22e">play</span>(<span style="color:#a6e22e">osc</span>, <span style="color:#e6db74">&#34;C5&#34;</span>, <span style="color:#a6e22e">cgcdur</span>, <span style="color:#a6e22e">nm</span>)<span style="color:#f92672">...</span>)
+	<span style="color:#a6e22e">output</span> = append(<span style="color:#a6e22e">output</span>, <span style="color:#a6e22e">play</span>(<span style="color:#a6e22e">osc</span>, <span style="color:#e6db74">&#34;G5&#34;</span>, <span style="color:#a6e22e">cgcdur</span>, <span style="color:#a6e22e">nm</span>)<span style="color:#f92672">...</span>)
+	<span style="color:#a6e22e">output</span> = append(<span style="color:#a6e22e">output</span>, <span style="color:#a6e22e">play</span>(<span style="color:#a6e22e">osc</span>, <span style="color:#e6db74">&#34;C5&#34;</span>, <span style="color:#a6e22e">cgcdur</span>, <span style="color:#a6e22e">nm</span>)<span style="color:#f92672">...</span>)
+	<span style="color:#a6e22e">output</span> = append(<span style="color:#a6e22e">output</span>, <span style="color:#a6e22e">play</span>(<span style="color:#a6e22e">osc</span>, <span style="color:#e6db74">&#34;WAIT&#34;</span>, <span style="color:#ae81ff">0.1</span>, <span style="color:#a6e22e">nm</span>)<span style="color:#f92672">...</span>)
+	<span style="color:#a6e22e">output</span> = append(<span style="color:#a6e22e">output</span>, <span style="color:#a6e22e">play</span>(<span style="color:#a6e22e">osc</span>, <span style="color:#e6db74">&#34;C5&#34;</span>, <span style="color:#a6e22e">cgcdur</span>, <span style="color:#a6e22e">nm</span>)<span style="color:#f92672">...</span>)
+	<span style="color:#a6e22e">output</span> = append(<span style="color:#a6e22e">output</span>, <span style="color:#a6e22e">play</span>(<span style="color:#a6e22e">osc</span>, <span style="color:#e6db74">&#34;G5&#34;</span>, <span style="color:#a6e22e">cgcdur</span>, <span style="color:#a6e22e">nm</span>)<span style="color:#f92672">...</span>)
+	<span style="color:#a6e22e">output</span> = append(<span style="color:#a6e22e">output</span>, <span style="color:#a6e22e">play</span>(<span style="color:#a6e22e">osc</span>, <span style="color:#e6db74">&#34;C5&#34;</span>, <span style="color:#a6e22e">cgcdur</span>, <span style="color:#a6e22e">nm</span>)<span style="color:#f92672">...</span>)
+
+	<span style="color:#a6e22e">wfmt</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">wave</span>.<span style="color:#a6e22e">NewWaveFmt</span>(<span style="color:#ae81ff">1</span>, <span style="color:#ae81ff">1</span>, <span style="color:#a6e22e">sr</span>, <span style="color:#ae81ff">16</span>, <span style="color:#66d9ef">nil</span>)
+	<span style="color:#a6e22e">wave</span>.<span style="color:#a6e22e">WriteFrames</span>(<span style="color:#a6e22e">output</span>, <span style="color:#a6e22e">wfmt</span>, <span style="color:#e6db74">&#34;frerejacques.wav&#34;</span>)
+}
+</code></pre></td></tr></table>
+</div>
+</div><p><a href="/audio/part12/frerejacques.wav">Download the result</a>, or view the video at the beginning of this
+post.</p>
+<p>Or, viewed in audacity</p>
+<p><img src="/audio/part12/audacity.png" alt=""></p>
+<hr>
+<p>If you liked this and want to know when I write new posts, the best way to keep up to date is by <a href="https://twitter.com/DylanMeeus">following me on
+twitter</a>.</p>
+
+  </div>
+  
+
+<div class="navigation navigation-single">
+    
+    <a href="/posts/audio-from-scratch-pt11/" class="navigation-prev">
+      <i aria-hidden="true" class="fa fa-chevron-left"></i>
+      <span class="navigation-tittle">Audio From Scratch With Go: Harmonics</span>
+    </a>
+    
+    
+</div>
+
+
+  
+
+  
+    
+
+
+</article>
+
+
+        </div>
+        
+    
+
+  
+  
+<script type="application/javascript">
+var doNotTrack = false;
+if (!doNotTrack) {
+	window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+	ga('create', 'UA-172416417-1', 'auto');
+	
+	ga('send', 'pageview');
+}
+</script>
+<script async src='https://www.google-analytics.com/analytics.js'></script>
+
+
+<script defer src="https://use.fontawesome.com/releases/v5.11.2/js/all.js" integrity="sha384-b3ua1l97aVGAPEIe48b4TC60WUQbQaGi2jqAWM90y0OZXZeyaTCWtBTKtjW2GXG1" crossorigin="anonymous"></script>
+
+
+
+
+    
+
+
+
+    </body>
+</html>

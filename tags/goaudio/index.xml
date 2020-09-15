@@ -6,10 +6,20 @@
     <description>Recent content in GoAudio on Dylan Meeus</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Sat, 12 Sep 2020 13:04:29 +0200</lastBuildDate>
+    <lastBuildDate>Sun, 13 Sep 2020 16:27:35 +0200</lastBuildDate>
     
 	<atom:link href="https://dylanmeeus.github.io/tags/goaudio/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>Audio From Scratch With Go: Frere Jacques</title>
+      <link>https://dylanmeeus.github.io/posts/audio-from-scratch-pt12/</link>
+      <pubDate>Sun, 13 Sep 2020 16:27:35 +0200</pubDate>
+      
+      <guid>https://dylanmeeus.github.io/posts/audio-from-scratch-pt12/</guid>
+      <description>In the last post I ended by saying we would be able to use GoAudio to generate some simple tunes. In this post we will actually put that to the test. Click the video to hear the end result :)
+  Frere Jacques When I was a kid, the first thing I was taught to play was the tune to &amp;lsquo;Frere Jacques&amp;rsquo; on my grandparents&amp;rsquo; piano (to their dismay, also the last thing I actually learned to play until I picked up a guitar 15 years later and played that badly).</description>
+    </item>
     
     <item>
       <title>Audio From Scratch With Go: Harmonics</title>
