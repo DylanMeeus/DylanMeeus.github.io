@@ -6,10 +6,20 @@
     <description>Recent content in GoAudio on Dylan Meeus</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Sun, 13 Sep 2020 16:27:35 +0200</lastBuildDate>
+    <lastBuildDate>Mon, 05 Oct 2020 21:38:02 +0200</lastBuildDate>
     
 	<atom:link href="https://dylanmeeus.github.io/tags/goaudio/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>Audio From Scratch With Go: Notes to Sound</title>
+      <link>https://dylanmeeus.github.io/posts/audio-from-scratch-pt13/</link>
+      <pubDate>Mon, 05 Oct 2020 21:38:02 +0200</pubDate>
+      
+      <guid>https://dylanmeeus.github.io/posts/audio-from-scratch-pt13/</guid>
+      <description>In the last post the tune to &amp;lsquo;Brother Jacob&amp;rsquo; was generated using GoAudio. We started of by actually generating all the notes and their corresponding frequencies, and mapping them to a corresponding string, such that when we played A4 we would get a frequency of 440.
+There were two problems with this from what I can tell, the first is that this approach is potentially repetitive. Each time we want to generate some music, we&amp;rsquo;re likely to generate a mapping of notes to frequencies.</description>
+    </item>
     
     <item>
       <title>Audio From Scratch With Go: Frère Jacques</title>

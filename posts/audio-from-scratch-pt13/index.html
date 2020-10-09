@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="en-us">
+    
+    
+
+
+    <head>
+    <link href="https://gmpg.org/xfn/11" rel="profile">
+    <meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta http-equiv="Cache-Control" content="public" />
+<!-- Enable responsiveness on mobile devices -->
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+<meta name="generator" content="Hugo 0.73.0" />
+
+    
+    
+    
+
+<title>Audio From Scratch With Go: Notes to Sound • Dylan Meeus</title>
+
+
+<meta name="twitter:card" content="summary_large_image"/>
+<meta name="twitter:image" content="https://dylanmeeus.github.io/audio/part12/audacity.png"/>
+
+<meta name="twitter:title" content="Audio From Scratch With Go: Notes to Sound"/>
+<meta name="twitter:description" content="In the last post the tune to &lsquo;Brother Jacob&rsquo; was generated using GoAudio. We started of by actually generating all the notes and their corresponding frequencies, and mapping them to a corresponding string, such that when we played A4 we would get a frequency of 440.
+There were two problems with this from what I can tell, the first is that this approach is potentially repetitive. Each time we want to generate some music, we&rsquo;re likely to generate a mapping of notes to frequencies."/>
+<meta name="twitter:site" content="@DylanMeeus"/>
+
+<meta property="og:title" content="Audio From Scratch With Go: Notes to Sound" />
+<meta property="og:description" content="In the last post the tune to &lsquo;Brother Jacob&rsquo; was generated using GoAudio. We started of by actually generating all the notes and their corresponding frequencies, and mapping them to a corresponding string, such that when we played A4 we would get a frequency of 440.
+There were two problems with this from what I can tell, the first is that this approach is potentially repetitive. Each time we want to generate some music, we&rsquo;re likely to generate a mapping of notes to frequencies." />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://dylanmeeus.github.io/posts/audio-from-scratch-pt13/" />
+<meta property="og:image" content="https://dylanmeeus.github.io/audio/part12/audacity.png" />
+<meta property="article:published_time" content="2020-10-05T21:38:02+02:00" />
+<meta property="article:modified_time" content="2020-10-05T21:38:02+02:00" />
+
+
+    
+
+
+
+
+
+
+<link rel="stylesheet" href="/scss/hyde-hyde.6a83d62c39a364f036df4db1ecd564645635d6c7fc182425cb501218fec485f5.css" integrity="sha256-aoPWLDmjZPA2302x7NVkZFY11sf8GCQly1ASGP7EhfU=">
+
+
+<link rel="stylesheet" href="/scss/print.2744dcbf8a0b2e74f8a50e4b34e5f441be7cf93cc7de27029121c6a09f9e77bc.css" integrity="sha256-J0Tcv4oLLnT4pQ5LNOX0Qb58&#43;TzH3icCkSHGoJ&#43;ed7w=" media="print">
+
+
+
+
+    
+<script type="application/javascript">
+var doNotTrack = false;
+if (!doNotTrack) {
+	(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+	(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+	m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+	})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+	ga('create', 'UA-172416417-1', 'auto');
+	
+	ga('send', 'pageview');
+}
+</script>
+
+    
+<script type="application/javascript">
+var doNotTrack = false;
+if (!doNotTrack) {
+	window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+	ga('create', 'UA-172416417-1', 'auto');
+	
+	ga('send', 'pageview');
+}
+</script>
+<script async src='https://www.google-analytics.com/analytics.js'></script>
+
+
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+    <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
+    <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+    <!-- Icons -->
+    <link rel="apple-touch-icon-precomposed" sizes="144x144" href="/apple-touch-icon-144-precomposed.png">
+    <link rel="shortcut icon" href="/favicon.png">
+    
+    
+
+</head>
+
+
+    <body class=" ">
+    
+<div class="sidebar">
+  <div class="container ">
+    <div class="sidebar-about">
+      <span class="site__title">
+        <a href="https://dylanmeeus.github.io">Dylan Meeus</a>
+      </span>
+      
+      
+        <div class="author-image">
+          <img src="https://www.gravatar.com/avatar/174fdce3b3920fc7b21aff714b0b664d?s=240&d=mp" class="img--circle img--headshot element--center" alt="gravatar">
+        </div>
+      
+      <p class="site__description">
+        
+      </p>
+    </div>
+    <div class="collapsible-menu">
+      <input type="checkbox" id="menuToggle">
+      <label for="menuToggle">Dylan Meeus</label>
+      <div class="menu-content">
+        <div>
+	<ul class="sidebar-nav">
+		 
+		
+	</ul>
+</div>
+
+        <section class="social">
+	
+	<a href="https://twitter.com/DylanMeeus" rel="me"><i class="fab fa-twitter fa-lg" aria-hidden="true"></i></a>
+	
+	
+	
+	<a href="https://github.com/DylanMeeus" rel="me"><i class="fab fa-github fa-lg" aria-hidden="true"></i></a>
+	
+	
+	
+	
+	
+	
+	
+	<a href="https://linkedin.com/in/dylanmeeus" rel="me"><i class="fab fa-linkedin fa-lg" aria-hidden="true"></i></a>
+	
+	
+	
+	
+	
+	
+	
+	
+	
+</section>
+
+      </div>
+    </div>
+    
+
+
+  </div>
+</div>
+
+        <div class="content container">
+            
+    
+<article>
+  <header>
+    <h1>Audio From Scratch With Go: Notes to Sound</h1>
+    
+    
+<div class="post__meta">
+    
+    
+      <i class="fas fa-calendar-alt"></i> Oct 05, 2020
+    
+    
+    
+      
+      
+          in
+          
+          
+              <a class="badge badge-category" href="/categories/posts">POSTS</a>
+              
+          
+      
+    
+    
+    
+      
+      
+          <br/>
+           <i class="fas fa-tags"></i>
+          
+          <a class="badge badge-tag" href="/tags/audio">audio</a>
+           
+      
+          <a class="badge badge-tag" href="/tags/go">go</a>
+           
+      
+          <a class="badge badge-tag" href="/tags/goaudio">goaudio</a>
+          
+      
+    
+    
+    <br/>
+    <i class="fas fa-clock"></i> 5 min read
+</div>
+
+
+  </header>
+  
+  
+  <div class="post">
+    <p>In the <a href="https://dylanmeeus.github.io/posts/audio-from-scratch-pt12/">last post</a> the tune to &lsquo;Brother
+Jacob&rsquo; was generated using GoAudio. We started of by actually generating all the notes and their
+corresponding frequencies, and mapping them to a corresponding string, such that when we played <code>A4</code>
+we would get a frequency of <code>440</code>.</p>
+<p>There were two problems with this from what I can tell, the first is that this approach is
+potentially repetitive. Each time we want to generate some music, we&rsquo;re likely to generate a mapping
+of notes to frequencies. Having this as an external part of the code rather than the GoAudio library
+is the first problem.</p>
+<p>The second problem is that this approach was not flexible nor easy to read. Yes, the mapping did
+work, but can you easily see which octave the notes are being generated in?</p>
+<p>As a reminder, here is the original code:</p>
+<div class="highlight"><div style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4">
+<table style="border-spacing:0;padding:0;margin:0;border:0;width:auto;overflow:auto;display:block;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 2
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 3
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 4
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 5
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 6
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 7
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 8
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 9
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">10
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">11
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">12
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">13
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">14
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">15
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">16
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">17
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">18
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">19
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">20
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#66d9ef">func</span> <span style="color:#a6e22e">generateNotes</span>() <span style="color:#66d9ef">map</span>[<span style="color:#66d9ef">string</span>]<span style="color:#66d9ef">float64</span> {
+	<span style="color:#a6e22e">ni</span> <span style="color:#f92672">:=</span> <span style="color:#ae81ff">0</span>
+	<span style="color:#a6e22e">concertA</span> <span style="color:#f92672">:=</span> <span style="color:#ae81ff">440.</span>
+	<span style="color:#a6e22e">middleC</span> <span style="color:#f92672">:=</span> (<span style="color:#a6e22e">concertA</span> <span style="color:#f92672">*</span> <span style="color:#a6e22e">math</span>.<span style="color:#a6e22e">Pow</span>(<span style="color:#ae81ff">2</span>, <span style="color:#ae81ff">3.</span><span style="color:#f92672">/</span><span style="color:#ae81ff">12.</span>)) <span style="color:#f92672">/</span> <span style="color:#ae81ff">2.</span>
+	<span style="color:#a6e22e">FR</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">middleC</span>
+	<span style="color:#a6e22e">notemap</span> <span style="color:#f92672">:=</span> <span style="color:#66d9ef">map</span>[<span style="color:#66d9ef">string</span>]<span style="color:#66d9ef">float64</span>{}
+	<span style="color:#66d9ef">for</span> <span style="color:#a6e22e">i</span> <span style="color:#f92672">:=</span> <span style="color:#ae81ff">0</span>; <span style="color:#a6e22e">i</span> &lt; <span style="color:#ae81ff">24</span>; <span style="color:#a6e22e">i</span><span style="color:#f92672">++</span> {
+		<span style="color:#a6e22e">FK</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">FR</span> <span style="color:#f92672">*</span> <span style="color:#a6e22e">math</span>.<span style="color:#a6e22e">Pow</span>(<span style="color:#ae81ff">2</span>, float64(<span style="color:#a6e22e">i</span>)<span style="color:#f92672">/</span><span style="color:#ae81ff">12.</span>)
+		<span style="color:#a6e22e">note</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">notes</span>[<span style="color:#a6e22e">ni</span><span style="color:#f92672">%</span>len(<span style="color:#a6e22e">notes</span>)]
+		<span style="color:#a6e22e">octave</span> <span style="color:#f92672">:=</span> <span style="color:#ae81ff">4</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">i</span><span style="color:#f92672">/</span><span style="color:#ae81ff">12</span>
+		<span style="color:#66d9ef">var</span> <span style="color:#a6e22e">octs</span> <span style="color:#66d9ef">string</span>
+		<span style="color:#66d9ef">if</span> <span style="color:#a6e22e">octave</span> <span style="color:#f92672">!=</span> <span style="color:#ae81ff">0</span> {
+			<span style="color:#a6e22e">octs</span> = <span style="color:#a6e22e">strconv</span>.<span style="color:#a6e22e">Itoa</span>(<span style="color:#a6e22e">octave</span>)
+		}
+		<span style="color:#a6e22e">notemap</span>[<span style="color:#a6e22e">note</span><span style="color:#f92672">+</span><span style="color:#a6e22e">octs</span>] = <span style="color:#a6e22e">FK</span>
+		<span style="color:#a6e22e">ni</span><span style="color:#f92672">++</span>
+	}
+	<span style="color:#a6e22e">notemap</span>[<span style="color:#e6db74">&#34;WAIT&#34;</span>] = <span style="color:#ae81ff">0.</span>
+	<span style="color:#66d9ef">return</span> <span style="color:#a6e22e">notemap</span>
+}
+</code></pre></td></tr></table>
+</div>
+</div><p>Which octaves are generated here? Well, given that we find the frequency of middle C, which we calculated from
+A440, we can tell that we are starting at <code>C4</code> and moving up 24 semitones in the for-loop means we are
+moving across two octaves. Each octave being 12 semitones, thus we are covering both the fourth and
+fifth octave in this segment of code.</p>
+<h1 id="improving-generatenotes">Improving generateNotes()</h1>
+<p>The first problem is easily solved, the code that we are examining in the following section is now
+covered by <a href="https://github.com/DylanMeeus/GoAudio">GoAudio</a>. If you want to skip the rest of this
+post, you can just <a href="https://github.com/DylanMeeus/GoAudio/blob/master/synthesizer/synth.go#L64">view this
+file</a>.</p>
+<p>The second problem, which was to deal with the readability and flexibility of the code is tackled
+next. First, rather than keeping a map of all possible frequencies for all octaves in all notes, we
+will calculate it on the spot. This is more wasteful of our CPU resources, but if a user
+wanted to keep the full spectrum available they could keep the map locally, no need to pollute the
+library with this.</p>
+<p>Our botched together code from the last post does get us pretty close to a working solution here,
+To generate a frequency of a note in any octave, we have to change this line:</p>
+<div class="highlight"><div style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4">
+<table style="border-spacing:0;padding:0;margin:0;border:0;width:auto;overflow:auto;display:block;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go">    <span style="color:#a6e22e">FK</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">FR</span> <span style="color:#f92672">*</span> <span style="color:#a6e22e">math</span>.<span style="color:#a6e22e">Pow</span>(<span style="color:#ae81ff">2</span>, float64(<span style="color:#a6e22e">i</span>)<span style="color:#f92672">/</span><span style="color:#ae81ff">12.</span>)
+</code></pre></td></tr></table>
+</div>
+</div><p>Here we are stuck in octave 4 by default (due to FR) and we stay in octave 4 for as long as <code>i</code>is
+below 12. There are 12 semitones in an octave, so when we try to generate the frequency for <code>i = 13</code>
+we are generated it one octave higher, or <code>1 + 1/12</code>. This is the key to extending the formula to
+work for any octave. As our reference will still be A440, we have to calculate it with an offset of
+4 in mind. This gives us the following piece:</p>
+<div class="highlight"><div style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4">
+<table style="border-spacing:0;padding:0;margin:0;border:0;width:auto;overflow:auto;display:block;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go">	<span style="color:#a6e22e">FR</span> <span style="color:#f92672">*</span> <span style="color:#a6e22e">math</span>.<span style="color:#a6e22e">Pow</span>(<span style="color:#ae81ff">2</span>, float64(<span style="color:#a6e22e">octave</span><span style="color:#f92672">-</span><span style="color:#ae81ff">4</span>)<span style="color:#f92672">+</span>(float64(<span style="color:#a6e22e">i</span>)<span style="color:#f92672">/</span><span style="color:#ae81ff">12.</span>))
+</code></pre></td></tr></table>
+</div>
+</div><p>Now that we have this in place, we still need to figure out how to turn a note (A,B,..G) into
+something that we can plug into the formula. That&rsquo;s easier than it sounds, a note here correlates to
+a certain semitone, which in the equation above is represented by (i). Remember that in the previous
+post we were literally iterating through all semitones, thus notes, to generate all their
+frequencies.</p>
+<p>Thus, we add a mapping from note -&gt; integer:</p>
+<div class="highlight"><div style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4">
+<table style="border-spacing:0;padding:0;margin:0;border:0;width:auto;overflow:auto;display:block;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 2
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 3
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 4
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 5
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 6
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 7
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 8
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 9
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">10
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">11
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">12
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">13
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">14
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">15
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">16
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">17
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">18
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">19
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go">	<span style="color:#a6e22e">noteIndex</span> = <span style="color:#66d9ef">map</span>[<span style="color:#66d9ef">string</span>]<span style="color:#66d9ef">int</span>{
+		<span style="color:#e6db74">&#34;a&#34;</span>:  <span style="color:#ae81ff">0</span>,
+		<span style="color:#e6db74">&#34;a#&#34;</span>: <span style="color:#ae81ff">1</span>,
+		<span style="color:#e6db74">&#34;bb&#34;</span>: <span style="color:#ae81ff">1</span>,
+		<span style="color:#e6db74">&#34;b&#34;</span>:  <span style="color:#ae81ff">2</span>,
+		<span style="color:#e6db74">&#34;c&#34;</span>:  <span style="color:#ae81ff">3</span>,
+		<span style="color:#e6db74">&#34;c#&#34;</span>: <span style="color:#ae81ff">4</span>,
+		<span style="color:#e6db74">&#34;db&#34;</span>: <span style="color:#ae81ff">4</span>,
+		<span style="color:#e6db74">&#34;d&#34;</span>:  <span style="color:#ae81ff">5</span>,
+		<span style="color:#e6db74">&#34;d#&#34;</span>: <span style="color:#ae81ff">6</span>,
+		<span style="color:#e6db74">&#34;eb&#34;</span>: <span style="color:#ae81ff">6</span>,
+		<span style="color:#e6db74">&#34;e&#34;</span>:  <span style="color:#ae81ff">7</span>,
+		<span style="color:#e6db74">&#34;f&#34;</span>:  <span style="color:#ae81ff">8</span>,
+		<span style="color:#e6db74">&#34;f#&#34;</span>: <span style="color:#ae81ff">9</span>,
+		<span style="color:#e6db74">&#34;gb&#34;</span>: <span style="color:#ae81ff">9</span>,
+		<span style="color:#e6db74">&#34;g&#34;</span>:  <span style="color:#ae81ff">10</span>,
+		<span style="color:#e6db74">&#34;g#&#34;</span>: <span style="color:#ae81ff">11</span>,
+		<span style="color:#e6db74">&#34;ab&#34;</span>: <span style="color:#ae81ff">11</span>,
+	}
+</code></pre></td></tr></table>
+</div>
+</div><p>The sharps are denoted by <code>#</code>, and the flats are denoted by <code>b</code>. Thus <code>c# = db = 4</code>.
+Now that we have this system in place for the twelve semitones, we can plug it into the above
+formula. This we might assume the code becomes:</p>
+<div class="highlight"><div style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4">
+<table style="border-spacing:0;padding:0;margin:0;border:0;width:auto;overflow:auto;display:block;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">4
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">5
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#66d9ef">func</span> <span style="color:#a6e22e">NoteToFrequency</span>(<span style="color:#a6e22e">note</span> <span style="color:#66d9ef">string</span>, <span style="color:#a6e22e">octave</span> <span style="color:#66d9ef">int</span>) <span style="color:#66d9ef">float64</span> {
+	<span style="color:#a6e22e">note</span> = <span style="color:#a6e22e">strings</span>.<span style="color:#a6e22e">ToLower</span>(<span style="color:#a6e22e">strings</span>.<span style="color:#a6e22e">TrimSpace</span>(<span style="color:#a6e22e">note</span>))
+	<span style="color:#a6e22e">ni</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">noteIndex</span>[<span style="color:#a6e22e">note</span>]
+	<span style="color:#66d9ef">return</span> <span style="color:#a6e22e">FR</span> <span style="color:#f92672">*</span> <span style="color:#a6e22e">math</span>.<span style="color:#a6e22e">Pow</span>(<span style="color:#ae81ff">2</span>, float64(<span style="color:#a6e22e">octave</span><span style="color:#f92672">-</span><span style="color:#ae81ff">4</span>)<span style="color:#f92672">+</span>(float64(<span style="color:#a6e22e">ni</span>)<span style="color:#f92672">/</span><span style="color:#ae81ff">12.</span>))
+}
+</code></pre></td></tr></table>
+</div>
+</div><p>Unfortunately, this will not be correct yet. The problem lies in how this musical scale works, a new
+octave does not start on A, instead an octave starts on C and ends on B, hence the common spectrum is covered by <code>C0..B8</code>.
+I think this is just a historical curiosity of the musical scale commonly used in western music, but
+I don&rsquo;t know enough about the history to really know.</p>
+<p>What this means for us is that we have to adapt the octave slightly depending on which note we pass
+to the function. Concretely, for anything below C we will drop the octave by 1. Such that <code>A,4</code>
+effectively calculates <code>A,3</code>.</p>
+<div class="highlight"><div style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4">
+<table style="border-spacing:0;padding:0;margin:0;border:0;width:auto;overflow:auto;display:block;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 2
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 3
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 4
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 5
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 6
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 7
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 8
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 9
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">10
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#66d9ef">func</span> <span style="color:#a6e22e">NoteToFrequency</span>(<span style="color:#a6e22e">note</span> <span style="color:#66d9ef">string</span>, <span style="color:#a6e22e">octave</span> <span style="color:#66d9ef">int</span>) <span style="color:#66d9ef">float64</span> {
+	<span style="color:#a6e22e">note</span> = <span style="color:#a6e22e">strings</span>.<span style="color:#a6e22e">ToLower</span>(<span style="color:#a6e22e">strings</span>.<span style="color:#a6e22e">TrimSpace</span>(<span style="color:#a6e22e">note</span>))
+	<span style="color:#a6e22e">ni</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">noteIndex</span>[<span style="color:#a6e22e">note</span>]
+	<span style="color:#66d9ef">if</span> <span style="color:#a6e22e">ni</span> <span style="color:#f92672">&gt;=</span> <span style="color:#ae81ff">3</span> {
+		<span style="color:#75715e">// correct for octaves starting at C, not A.
+</span><span style="color:#75715e"></span>		<span style="color:#a6e22e">octave</span><span style="color:#f92672">--</span>
+	}
+	<span style="color:#a6e22e">FR</span> <span style="color:#f92672">:=</span> <span style="color:#ae81ff">440.</span>
+	<span style="color:#66d9ef">return</span> <span style="color:#a6e22e">FR</span> <span style="color:#f92672">*</span> <span style="color:#a6e22e">math</span>.<span style="color:#a6e22e">Pow</span>(<span style="color:#ae81ff">2</span>, float64(<span style="color:#a6e22e">octave</span><span style="color:#f92672">-</span><span style="color:#ae81ff">4</span>)<span style="color:#f92672">+</span>(float64(<span style="color:#a6e22e">ni</span>)<span style="color:#f92672">/</span><span style="color:#ae81ff">12.</span>))
+}
+</code></pre></td></tr></table>
+</div>
+</div><h2 id="rewriting-brother-jacob">Rewriting Brother Jacob</h2>
+<p>Now we&rsquo;re essentially ready to rewrite our tune from the <a href="https://dylanmeeus.github.io/posts/audio-from-scratch-pt12">previous
+post</a>, but I&rsquo;ve added one more
+convenience function to <a href="https://github.com/DylanMeeus/GoAudio">GoAudio</a>. I thought it&rsquo;d be handy if
+we could just pass the note+octave as a string, so that we can say <code>NoteFrequency(&quot;B4&quot;)</code> rather than
+<code>NoteFrequency(&quot;B&quot;,4)</code>. It&rsquo;s just a small &ldquo;quality of life&rdquo; addition. This convenience function can
+be seen in the <a href="https://github.com/DylanMeeus/GoAudio/blob/master/synthesizer/synth.go">ParseNoteToFrequency function</a>.</p>
+<p>Check <a href="https://gist.github.com/DylanMeeus/ee6c3eb4acebedd5682a1e2989ccd0fa">this gist</a> for an example of the updated code.</p>
+<hr>
+<p>If you liked this and want to know when I write new posts, the best way to keep up to date is by <a href="https://twitter.com/DylanMeeus">following me on
+twitter</a>.</p>
+
+  </div>
+  
+
+<div class="navigation navigation-single">
+    
+    <a href="/posts/audio-from-scratch-pt12/" class="navigation-prev">
+      <i aria-hidden="true" class="fa fa-chevron-left"></i>
+      <span class="navigation-tittle">Audio From Scratch With Go: Frère Jacques</span>
+    </a>
+    
+    
+</div>
+
+
+  
+
+  
+    
+
+
+</article>
+
+
+        </div>
+        
+    
+
+  
+  
+<script type="application/javascript">
+var doNotTrack = false;
+if (!doNotTrack) {
+	window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+	ga('create', 'UA-172416417-1', 'auto');
+	
+	ga('send', 'pageview');
+}
+</script>
+<script async src='https://www.google-analytics.com/analytics.js'></script>
+
+
+<script defer src="https://use.fontawesome.com/releases/v5.11.2/js/all.js" integrity="sha384-b3ua1l97aVGAPEIe48b4TC60WUQbQaGi2jqAWM90y0OZXZeyaTCWtBTKtjW2GXG1" crossorigin="anonymous"></script>
+
+
+
+
+    
+
+
+
+    </body>
+</html>
